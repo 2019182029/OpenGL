@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CObject.h"
+#include "CPlayer.h"
 #include "CCamera.h"
 
 std::default_random_engine dre{ std::random_device{}() };
@@ -27,6 +28,7 @@ GLuint vertexShader;
 GLuint fragmentShader;
 GLuint shaderProgramID;
 
+Object* pPlayer;
 std::vector<Object*> objects;
 std::vector<Camera*> cameras;
 
@@ -104,7 +106,9 @@ void InitBuffer() {
 
 	glUseProgram(shaderProgramID);
 
-	add_object("Cube", 5.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f);
+	pPlayer = new Player(0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f);
+	pPlayer->SetVbo();
+	pPlayer->Rotate(-90.0f, 0.0f, 0.0f);
 }
 
 void make_vertexShaders() {
@@ -185,6 +189,8 @@ GLvoid draw_scene(GLvoid) {
 		cam->PrepareRender(shaderProgramID);
 
 		glUniform3f(glGetUniformLocation(shaderProgramID, "viewPos"), cam->m_vf3Position.x, cam->m_vf3Position.y, cam->m_vf3Position.z);
+
+		pPlayer->Render(shaderProgramID);
 
 		for (const auto& obj : objects) {
 			obj->Render(shaderProgramID);

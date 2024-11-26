@@ -8,11 +8,11 @@ Mesh::Mesh(GLfloat flength) {
 	m_flength = flength;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 TriangleMesh::TriangleMesh() : Mesh() {
 
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 TriangleMesh::TriangleMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Mesh(flength) {
 	DiffusedVertex vertex = DiffusedVertex(0.0f, 2.0f / 3.0f * flength, 0.0f, fr, fg, fb);  // 0 : ²À´ë±â
@@ -273,6 +273,125 @@ PyramidMesh::PyramidMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : 
 	m_uiIndicies.emplace_back(1);
 	m_uiIndicies.emplace_back(4);
 	m_uiIndicies.emplace_back(2);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+AirplaneMesh::AirplaneMesh() : Mesh() {
+
+}
+
+AirplaneMesh::AirplaneMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Mesh(flength) {
+	float fx = flength * 0.6f, fy = flength * 0.6f, fz = flength * 0.1f;
+
+	float x1 = fx * 0.2f, y1 = fy * 0.2f, x2 = fx * 0.1f, y3 = fy * 0.3f, y2 = ((y1 - (fy - y3)) / x1) * x2 + (fy - y3);
+
+	auto AddVertex = [&](float x, float y, float z) {
+		DiffusedVertex vertex = DiffusedVertex(x, y, z, fr, fg, fb);
+		vertex.normal = glm::normalize(glm::vec3(vertex.x, vertex.y, vertex.z));
+		m_vVertices.emplace_back(vertex);
+		};
+
+	// Upper Plane
+	AddVertex(0.0f, +(fy + y3), -fz);
+	AddVertex(+x1, -y1, -fz);
+	AddVertex(0.0f, 0.0f, -fz);
+
+	AddVertex(0.0f, +(fy + y3), -fz);
+	AddVertex(0.0f, 0.0f, -fz);
+	AddVertex(-x1, -y1, -fz);
+
+	AddVertex(+x2, +y2, -fz);
+	AddVertex(+fx, -y3, -fz);
+	AddVertex(+x1, -y1, -fz);
+
+	AddVertex(-x2, +y2, -fz);
+	AddVertex(-x1, -y1, -fz);
+	AddVertex(-fx, -y3, -fz);
+
+	// Lower Plane
+	AddVertex(0.0f, +(fy + y3), +fz);
+	AddVertex(0.0f, 0.0f, +fz);
+	AddVertex(+x1, -y1, +fz);
+
+	AddVertex(0.0f, +(fy + y3), +fz);
+	AddVertex(-x1, -y1, +fz);
+	AddVertex(0.0f, 0.0f, +fz);
+
+	AddVertex(+x2, +y2, +fz);
+	AddVertex(+x1, -y1, +fz);
+	AddVertex(+fx, -y3, +fz);
+
+	AddVertex(-x2, +y2, +fz);
+	AddVertex(-fx, -y3, +fz);
+	AddVertex(-x1, -y1, +fz);
+
+	// Left Plane
+	AddVertex(0.0f, +(fy + y3), +fz);
+	AddVertex(0.0f, +(fy + y3), -fz);
+	AddVertex(-x2, +y2, -fz);
+
+	AddVertex(0.0f, +(fy + y3), +fz);
+	AddVertex(-x2, +y2, -fz);
+	AddVertex(-x2, +y2, +fz);
+
+	AddVertex(-x2, +y2, +fz);
+	AddVertex(-x2, +y2, -fz);
+	AddVertex(-fx, -y3, -fz);
+
+	AddVertex(-x2, +y2, +fz);
+	AddVertex(-fx, -y3, -fz);
+	AddVertex(-fx, -y3, +fz);
+
+	// Right Plane
+	AddVertex(0.0f, +(fy + y3), -fz);
+	AddVertex(0.0f, +(fy + y3), +fz);
+	AddVertex(+x2, +y2, -fz);
+
+	AddVertex(+x2, +y2, -fz);
+	AddVertex(0.0f, +(fy + y3), +fz);
+	AddVertex(+x2, +y2, +fz);
+
+	AddVertex(+x2, +y2, -fz);
+	AddVertex(+x2, +y2, +fz);
+	AddVertex(+fx, -y3, -fz);
+
+	AddVertex(+fx, -y3, -fz);
+	AddVertex(+x2, +y2, +fz);
+	AddVertex(+fx, -y3, +fz);
+
+	// Back Plane
+	AddVertex(+x1, -y1, -fz);
+	AddVertex(+fx, -y3, -fz);
+	AddVertex(+fx, -y3, +fz);
+
+	AddVertex(+x1, -y1, -fz);
+	AddVertex(+fx, -y3, +fz);
+	AddVertex(+x1, -y1, +fz);
+
+	AddVertex(0.0f, 0.0f, -fz);
+	AddVertex(+x1, -y1, -fz);
+	AddVertex(+x1, -y1, +fz);
+
+	AddVertex(0.0f, 0.0f, -fz);
+	AddVertex(+x1, -y1, +fz);
+	AddVertex(0.0f, 0.0f, +fz);
+
+	AddVertex(0.0f, 0.0f, -fz);
+	AddVertex(0.0f, 0.0f, +fz);
+	AddVertex(-x1, -y1, +fz);
+
+	AddVertex(0.0f, 0.0f, -fz);
+	AddVertex(-x1, -y1, +fz);
+	AddVertex(-x1, -y1, -fz);
+
+	AddVertex(-x1, -y1, -fz);
+	AddVertex(-x1, -y1, +fz);
+	AddVertex(-fx, -y3, +fz);
+
+	AddVertex(-x1, -y1, -fz);
+	AddVertex(-fx, -y3, +fz);
+	AddVertex(-fx, -y3, -fz);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
