@@ -78,6 +78,8 @@ public:
 
 class Obstacle : public Object {
 public:
+	float xdir, ydir, zdir;
+
 	bool m_bIsBlowingUp;
 	float m_fElapsedTime;
 

@@ -11,7 +11,7 @@ uniform vec3 lightPos;  // 조명 위치
 uniform vec3 viewPos;  // 카메라 위치
 
 void main(void) {
-	float ambientLight = 0.5f;  // 주변 조명 계수
+	float ambientLight = 0.1f;  // 주변 조명 계수
 	vec3 ambient = ambientLight * lightColor;
 
 	vec3 normalVector = normalize(FragNormal);

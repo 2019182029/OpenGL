@@ -279,6 +279,8 @@ Obstacle::Obstacle() : Object() {
 }
 
 Obstacle::Obstacle(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Object(fx, fy, fz, flength) {
+	SetRotationSpeed(glm::linearRand(-0.5f, 0.5f), glm::linearRand(-0.5f, 0.5f), glm::linearRand(-0.5f, 0.5f));
+
 	switch (uidObstacle(dreObstacle)) {
 	case 0:
 		m_pMesh = new CubeMesh(flength, fr, fg, fb);
@@ -295,7 +297,12 @@ Obstacle::Obstacle(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat 
 	default:
 		break;
 	}
+
 	m_sType = "Obstacle";
+
+	xdir = glm::linearRand(-2.0f / 60.0f, 2.0f / 60.0f);
+	ydir = glm::linearRand(-2.0f / 60.0f, 2.0f / 60.0f);
+	zdir = glm::linearRand(4.0f / 60.0f, 8.0f / 60.0f);
 
 	m_bIsBlowingUp = false;
 	m_fElapsedTime = 0.0f;
@@ -327,6 +334,11 @@ void Obstacle::Update() {
 		}
 	}
 	else {
+		if (m_vf3Position.x + xdir < -2.0f + m_flength || m_vf3Position.x + xdir > 2.0f - m_flength) { xdir *= -1.0f; }
+		if (m_vf3Position.y + ydir < -2.0f + m_flength || m_vf3Position.y + ydir > 2.0f - m_flength) { ydir *= -1.0f; }
+
+		Translate(xdir, ydir, zdir);
+
 		Object::Update();
 	}
 }

@@ -33,6 +33,7 @@ std::vector<Object*> walls;
 std::vector<Object*> objects;
 std::vector<Camera*> cameras;
 
+GLfloat weight = 0.1f;
 glm::vec3 lightColor = { 1.0f, 1.0f, 1.0f };
 glm::vec3 lightPosition = { 0.0f, 0.0f, 1.0f };
 
@@ -207,7 +208,7 @@ GLvoid draw_scene(GLvoid) {
 
 		glUniform3f(glGetUniformLocation(shaderProgramID, "viewPos"), cam->m_vf3Position.x, cam->m_vf3Position.y, cam->m_vf3Position.z);
 
-		pPlayer->Render(shaderProgramID);
+		//pPlayer->Render(shaderProgramID);
 
 		for (const auto& wall : walls) {
 			wall->Render(shaderProgramID);
@@ -245,13 +246,19 @@ GLvoid Mouse(int button, int state, int x, int y) {
 }
 
 GLvoid TimerFunction(int value) {
+	if (glm::linearRand(0.0f, 10.0f) < weight) {
+		Object* pObject = new Obstacle(0.0f, 0.0f, -30.0f, 0.5f, uid(dre) / 10.0f, uid(dre) / 10.0f, uid(dre) / 10.0f);
+		pObject->SetVbo();
+		objects.emplace_back(pObject);
+	}
+
 	for (const auto& obj : objects) {
 		obj->Update();
 	}
 
-	// 폭발 애니메이션이 끝난 장애물 제거
+	// 카메라 뒤쪽으로 넘어갔거나 폭발 애니메이션이 끝난 장애물 제거
 	objects.erase(std::remove_if(objects.begin(), objects.end(), [](const auto& obj) {
-		if (((Obstacle*)obj)->m_fElapsedTime > 2.5f) {
+		if (((Obstacle*)obj)->m_vf3Position.z > 2.5f || ((Obstacle*)obj)->m_fElapsedTime > 2.5f) {
 			delete obj;
 			return true;
 		}
