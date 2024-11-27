@@ -37,6 +37,10 @@ GLfloat weight = 0.1f;
 glm::vec3 lightColor = { 1.0f, 1.0f, 1.0f };
 glm::vec3 lightPosition = { 0.0f, 0.0f, 1.0f };
 
+auto beforeTime = std::chrono::high_resolution_clock::now();
+auto currentTime = std::chrono::high_resolution_clock::now();
+double elapsedTime = 0.0;
+
 int main(int argc, char** argv) {
 	// 윈도우 생성
 	glutInit(&argc, argv);
@@ -264,6 +268,20 @@ GLvoid TimerFunction(int value) {
 		}
 		return false;
 		}), objects.end());
+
+	// 1초마다 난이도 상승
+	currentTime = std::chrono::high_resolution_clock::now();
+	elapsedTime += ((std::chrono::duration<double>)std::chrono::duration_cast<std::chrono::microseconds>(currentTime - beforeTime)).count();
+	beforeTime = std::chrono::high_resolution_clock::now();
+
+	if (elapsedTime > 1.0) {
+		weight += 0.01f;
+		lightColor = { lightColor.x - 0.01f, lightColor.y - 0.01f, lightColor.z - 0.01f };
+
+		elapsedTime = 0.0;
+	}
+
+	std::cout << weight << std::endl;
 
 	glutPostRedisplay();
 	glutTimerFunc(16, TimerFunction, 0);
