@@ -68,7 +68,6 @@ CubeMesh::CubeMesh() : Mesh() {
 
 CubeMesh::CubeMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Mesh(flength) {
 	DiffusedVertex vertex = DiffusedVertex(-flength / 2.0f, flength / 2.0f, flength / 2.0f, fr, fg, fb);  // 0 : Á¤¸é ¿ÞÂÊ À§
-	std::cout << vertex.r << " " << vertex.g << " " << vertex.b << std::endl;
 	vertex.normal = glm::normalize(glm::vec3(vertex.x, vertex.y, vertex.z));
 	m_vVertices.emplace_back(vertex);
 

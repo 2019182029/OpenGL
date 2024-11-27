@@ -76,6 +76,25 @@ public:
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class Obstacle : public Object {
+public:
+	bool m_bIsBlowingUp;
+	float m_fElapsedTime;
+
+	Mesh* m_pExplosionMesh;
+	glm::vec3 m_pvf3Vectors[64];
+	glm::mat4 m_pmf4x4Transforms[64];
+
+	Obstacle();
+	Obstacle(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+
+	virtual void Update();
+	void PrepareExplosion();
+	virtual void Render(GLuint iShaderProgramId);
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class HierarchyObject : public Object {
 public:
 	GLUquadric* m_pQobj;

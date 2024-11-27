@@ -29,6 +29,7 @@ GLuint fragmentShader;
 GLuint shaderProgramID;
 
 Object* pPlayer;
+std::vector<Object*> walls;
 std::vector<Object*> objects;
 std::vector<Camera*> cameras;
 
@@ -57,7 +58,7 @@ int main(int argc, char** argv) {
 	make_shaderProgram();
 	InitBuffer();
 
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClearDepth(1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
@@ -93,22 +94,38 @@ char* filetobuf(const char* file) {
 
 void InitBuffer() {
 	Camera* pCamera = new ProjCamera();
-	pCamera->SetView(glm::vec3(-1.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+	pCamera->SetView(glm::vec3(0.0f, 0.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 	pCamera->SetViewport(0, 0, width, height);
-	((ProjCamera*)pCamera)->SetProj(glm::radians(90.0f), 1.0f, 0.1f, 100.0f);
+	((ProjCamera*)pCamera)->SetProj(glm::radians(90.0f), 1.0f, 0.01f, 25.0f);
 	cameras.push_back(pCamera);
-
-	//Camera* pCamera = new OrthoCamera();
-	//pCamera->SetView(glm::vec3(-1.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-	//pCamera->SetViewport(0, 0, width, height);
-	//((OrthoCamera*)pCamera)->SetOrtho(-1.0f, 1.0f, -1.0f, 1.0f, 0.01f, 100.0f);
-	//cameras.push_back(pCamera);
 
 	glUseProgram(shaderProgramID);
 
-	pPlayer = new Player(0.0f, 0.0f, 0.0f, 1.0f, 0.5f, 0.5f, 0.5f);
+	// 플레이어
+	pPlayer = new Player(0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 0.5f);
 	pPlayer->SetVbo();
 	pPlayer->Rotate(-90.0f, 0.0f, 0.0f);
+
+	// 벽
+	Object* pObject = new SquareObject(0.0f, -2.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f);  // 아랫면
+	pObject->Rotate(-90.0f, 0.0f, 0.0f);
+	pObject->SetVbo();
+	walls.emplace_back(pObject);
+
+	pObject = new SquareObject(2.0f, 0.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f);  // 오른면
+	pObject->Rotate(0.0f, -90.0f, 0.0f);
+	pObject->SetVbo();
+	walls.emplace_back(pObject);
+
+	pObject = new SquareObject(0.0f, 2.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f);  // 윗면
+	pObject->Rotate(90.0f, 0.0f, 0.0f);
+	pObject->SetVbo();
+	walls.emplace_back(pObject);
+
+	pObject = new SquareObject(-2.0f, 0.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f);  // 왼면
+	pObject->Rotate(0.0f, 90.0f, 0.0f);
+	pObject->SetVbo();
+	walls.emplace_back(pObject);
 }
 
 void make_vertexShaders() {
@@ -192,6 +209,10 @@ GLvoid draw_scene(GLvoid) {
 
 		pPlayer->Render(shaderProgramID);
 
+		for (const auto& wall : walls) {
+			wall->Render(shaderProgramID);
+		}
+
 		for (const auto& obj : objects) {
 			obj->Render(shaderProgramID);
 		}
@@ -205,7 +226,10 @@ GLvoid reshape(int w, int h) {
 }
 
 GLvoid Keyboard(unsigned char key, int x, int y) {
-
+	switch (key) {
+	default:
+		break;
+	}
 }
 
 GLvoid KeyboardUp(unsigned char key, int x, int y){
@@ -224,6 +248,15 @@ GLvoid TimerFunction(int value) {
 	for (const auto& obj : objects) {
 		obj->Update();
 	}
+
+	// 폭발 애니메이션이 끝난 장애물 제거
+	objects.erase(std::remove_if(objects.begin(), objects.end(), [](const auto& obj) {
+		if (((Obstacle*)obj)->m_fElapsedTime > 2.5f) {
+			delete obj;
+			return true;
+		}
+		return false;
+		}), objects.end());
 
 	glutPostRedisplay();
 	glutTimerFunc(16, TimerFunction, 0);
