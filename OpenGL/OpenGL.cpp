@@ -107,7 +107,7 @@ void InitBuffer() {
 	glUseProgram(shaderProgramID);
 
 	// 플레이어
-	pPlayer = new Player(0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.5f, 0.5f);
+	pPlayer = new Player(0.0f, -1.0f, 0.0f, 0.5f, 0.0f, 1.0f, 1.0f);
 	pPlayer->SetVbo();
 	pPlayer->Rotate(-90.0f, 0.0f, 0.0f);
 
@@ -212,7 +212,7 @@ GLvoid draw_scene(GLvoid) {
 
 		glUniform3f(glGetUniformLocation(shaderProgramID, "viewPos"), cam->m_vf3Position.x, cam->m_vf3Position.y, cam->m_vf3Position.z);
 
-		//pPlayer->Render(shaderProgramID);
+		pPlayer->Render(shaderProgramID);
 
 		for (const auto& wall : walls) {
 			wall->Render(shaderProgramID);
@@ -232,13 +232,30 @@ GLvoid reshape(int w, int h) {
 
 GLvoid Keyboard(unsigned char key, int x, int y) {
 	switch (key) {
+	case 'w':
+	case 'a':
+	case 's':
+	case 'd':
+		//pPlayer->함수(key);
+		break;
+
 	default:
 		break;
 	}
 }
 
 GLvoid KeyboardUp(unsigned char key, int x, int y){
+	switch (key) {
+	case 'w':
+	case 'a':
+	case 's':
+	case 'd':
+		//pPlayer->함수(key);
+		break;
 
+	default:
+		break;
+	}
 }
 
 GLvoid Special(int key, int x, int y) {
@@ -280,8 +297,6 @@ GLvoid TimerFunction(int value) {
 
 		elapsedTime = 0.0;
 	}
-
-	std::cout << weight << std::endl;
 
 	glutPostRedisplay();
 	glutTimerFunc(16, TimerFunction, 0);
