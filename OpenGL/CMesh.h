@@ -6,6 +6,7 @@ class Vertex {
 public:
 	GLfloat x;  GLfloat y;  GLfloat z;
 	glm::vec3 normal;
+	GLfloat s;  GLfloat t;
 
 	Vertex() { x = 0.0f; y = 0.0f; z = 0.0f; };
 	Vertex(GLfloat fx, GLfloat fy, GLfloat fz) : x(fx), y(fy), z(fz) {};

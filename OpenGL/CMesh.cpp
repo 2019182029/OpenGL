@@ -17,12 +17,15 @@ TriangleMesh::TriangleMesh() : Mesh() {
 TriangleMesh::TriangleMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Mesh(flength) {
 	DiffusedVertex vertex = DiffusedVertex(0.0f, 2.0f / 3.0f * flength, 0.0f, fr, fg, fb);  // 0 : 꼭대기
 	vertex.normal = { 0.0f, 0.0f, 1.0f };
+	vertex.s = 0.5f;  vertex.t = 1.0f;
 	m_vVertices.emplace_back(vertex);
 
 	vertex.x = -flength / sqrt(3.0f);  vertex.y = -flength / 3.0f;  // 1 : 정면 왼쪽 아래
+	vertex.s = 0.0f;  vertex.t = 0.0f;
 	m_vVertices.emplace_back(vertex);
 
 	vertex.x = flength / sqrt(3.0f);  // 2 : 정면 오른쪽 아래
+	vertex.s = 1.0f;  vertex.t = 0.0f;
 	m_vVertices.emplace_back(vertex);
 
 	// 정면
@@ -38,15 +41,19 @@ SquareMesh::SquareMesh() : Mesh() {
 SquareMesh::SquareMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Mesh(flength) {
 	DiffusedVertex vertex = DiffusedVertex(-flength / 2.0f, flength / 2.0f, 0.0f, fr, fg, fb);  // 0 : 정면 왼쪽 위
 	vertex.normal = { 0.0f, 0.0f, 1.0f };
+	vertex.s = 0.0f;  vertex.t = 1.0f;
 	m_vVertices.emplace_back(vertex);
 
 	vertex.y = -flength / 2.0f;  // 1 : 정면 왼쪽 아래
+	vertex.s = 0.0f;  vertex.t = 0.0f;
 	m_vVertices.emplace_back(vertex);
 
 	vertex.x = flength / 2.0f; vertex.y = flength / 2.0f;  // 2 : 정면 오른쪽 위
+	vertex.s = 1.0f;  vertex.t = 1.0f;
 	m_vVertices.emplace_back(vertex);
 
 	vertex.y = -flength / 2.0f;  // 3 : 정면 오른쪽 아래
+	vertex.s = 1.0f;  vertex.t = 0.0f;
 	m_vVertices.emplace_back(vertex);
 
 	// 정면 삼각형 1

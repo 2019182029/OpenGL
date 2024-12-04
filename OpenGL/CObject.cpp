@@ -18,6 +18,8 @@ Object::Object() {
 	m_AABB[0] = glm::vec3{ 1.0f };
 	m_AABB[1] = glm::vec3{ 1.0f };
 
+	m_bUseTexture = false;
+
 	m_sType = "";
 }
 
@@ -41,6 +43,8 @@ Object::Object(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength) {
 	m_AABB[0] = glm::vec3{ 1.0f };
 	m_AABB[1] = glm::vec3{ 1.0f };
 
+	m_bUseTexture = false;
+
 	m_sType = "";
 }
 
@@ -59,6 +63,92 @@ void Object::SetVbo() {
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_pMesh->m_uiIndicies.size() * sizeof(unsigned int), m_pMesh->m_uiIndicies.data(), GL_STATIC_DRAW);
+}
+
+void Object::SetTexture(const char* fileName) {
+	m_bUseTexture = true;
+
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	unsigned char* data = LoadDIBitmap(fileName, &bmp);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, 1024, 1024, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+}
+
+GLubyte* Object::LoadDIBitmap(const char* filename, BITMAPINFO** info) {
+	FILE* fp;
+	GLubyte* bits;
+	int bitsize, infosize;
+	BITMAPFILEHEADER header;
+
+	// 바이너리 읽기 모드로 파일을 연다
+	if ((fp = fopen(filename, "rb")) == NULL) {
+		return NULL;
+	}
+
+	// 비트맵 파일 헤더를 읽는다.
+	if (fread(&header, sizeof(BITMAPFILEHEADER), 1, fp) < 1) {
+		fclose(fp);
+		return NULL;
+	}
+
+	// 파일이 BMP 파일인지 확인한다.
+	if (header.bfType != 'MB') {
+		fclose(fp);
+		return NULL;
+	}
+
+	// BITMAPINFOHEADER 위치로 간다.
+	infosize = header.bfOffBits - sizeof(BITMAPFILEHEADER);
+
+	// 비트맵 이미지 데이터를 넣을 메모리 할당을 한다.
+	if ((*info = (BITMAPINFO*)malloc(infosize)) == NULL) {
+		fclose(fp);
+		return NULL;
+	}
+
+	// 비트맵 인포 헤더를 읽는다.
+	if (fread(*info, 1, infosize, fp) < (unsigned int)infosize) {
+		free(*info);
+		fclose(fp);
+		return NULL;
+	}
+
+	// 비트맵의 크기 설정
+	if ((bitsize = (*info)->bmiHeader.biSizeImage) == 0) {
+		bitsize = ((*info)->bmiHeader.biWidth * (*info)->bmiHeader.biBitCount + 7) / 8.0 * abs((*info)->bmiHeader.biHeight);
+	}
+
+	// 비트맵의 크기만큼 메모리를 할당한다.
+	if ((bits = (unsigned char*)malloc(bitsize)) == NULL) {
+		free(*info);
+		fclose(fp);
+		return NULL;
+	}
+
+	//--- 비트맵 데이터를 bit(GLubyte 타입)에 저장한다.
+	if (fread(bits, 1, bitsize, fp) < (unsigned int)bitsize) {
+		free(*info);
+		free(bits);
+		fclose(fp);
+		return NULL;
+	}
+
+	// BMP의 BFR 색상 데이터를 OpenGL의 RGB 색상 데이터로 전환
+	for (int i = 0; i < bitsize; i += 3) {
+		unsigned char temp = bits[i];     // Blue
+		bits[i] = bits[i + 2];            // Red
+		bits[i + 2] = temp;               // Blue -> Red
+	}
+
+	fclose(fp);
+	return bits;
 }
 
 void Object::SetRotationSpeed(GLfloat fx, GLfloat fy, GLfloat fz) {
@@ -185,8 +275,13 @@ void Object::PrepareRender(GLuint iShaderProgramId) {
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)(2 * 3 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
+
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)(8 * sizeof(float)));
+	glEnableVertexAttribArray(3);
+
+	glBindTexture(GL_TEXTURE_2D, texture);
 
 	glm::mat4 mf4x4World = m_mf4x4World;
 
@@ -207,6 +302,9 @@ void Object::PrepareRender(GLuint iShaderProgramId) {
 
 	unsigned int normalLocation = glGetUniformLocation(iShaderProgramId, "normalTransform");
 	glUniformMatrix4fv(normalLocation, 1, GL_FALSE, glm::value_ptr(mf4x4Normal));
+
+	unsigned int textureLocation = glGetUniformLocation(iShaderProgramId, "useTexture");
+	glUniform1i(textureLocation, m_bUseTexture);
 }
 
 void Object::Render(GLuint iShaderProgramId) {
@@ -355,21 +453,21 @@ void Obstacle::PrepareExplosion() {
 
 void Obstacle::Render(GLuint iShaderProgramId) {
 	if (m_bIsBlowingUp) {
+		glBindVertexArray(vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+
+		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)(2 * 3 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+
 		for (int i = 0; i < 64; ++i) {
-			glBindVertexArray(vao);
-
-			glBindBuffer(GL_ARRAY_BUFFER, vbo);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)0);
-			glEnableVertexAttribArray(0);
-
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)(3 * sizeof(float)));
-			glEnableVertexAttribArray(1);
-
-			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)(2 * 3 * sizeof(float)));
-			glEnableVertexAttribArray(2);
-
 			unsigned int modelLocation = glGetUniformLocation(iShaderProgramId, "modelTransform");
 			glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(m_pmf4x4Transforms[i]));
 

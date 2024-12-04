@@ -6,6 +6,8 @@
 class Object {
 public:
 	GLuint vao, vbo, ebo;
+	unsigned int texture;
+	BITMAPINFO* bmp;
 
 	glm::mat4 m_mf4x4World;
 
@@ -20,6 +22,8 @@ public:
 	Mesh* m_pMesh;
 	glm::vec3 m_AABB[2];
 
+	bool m_bUseTexture;
+
 	std::string m_sType;
 
 	Object();
@@ -27,6 +31,9 @@ public:
 	~Object();
 
 	void SetVbo();
+	void SetTexture(const char* fileName);
+	GLubyte* LoadDIBitmap(const char* filename, BITMAPINFO** info);
+
 	void SetRotationSpeed(GLfloat fx, GLfloat fy, GLfloat fz);
 	void SetRevolution(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat fxRadian, GLfloat fyRadian, GLfloat fzRadian);
 
