@@ -7,7 +7,6 @@ Player::Player() {
 
 Player::Player(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Object(fx, fy, fz, flength) {
 	m_pMesh = new AirplaneMesh(flength, fr, fg, fb, fa);
-	if (fa != 1.0f) { m_bTranslucent = true; }
 	m_sType = "Player";
 }
 void Player::Render(GLuint iShaderProgramId) {
