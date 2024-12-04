@@ -12,39 +12,51 @@ Player::Player(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, 
 }
 void Player::Render(GLuint iShaderProgramId) {
 	Object::PrepareRender(iShaderProgramId);
-
+		
 	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)m_pMesh->m_vVertices.size());
 }
+
 void Player::Update() {
-	if (m_vf3Position.x + xdir < -2.0f + m_flength || m_vf3Position.x + xdir > 2.0f - m_flength) xdir = 0;
-	if (m_vf3Position.y + ydir < -2.0f + m_flength || m_vf3Position.y + ydir > 2.0f - m_flength) ydir = 0;
+	if (m_vf3Position.x + xdir < -2.0f + m_flength || m_vf3Position.x + xdir > 2.0f - m_flength) {
+		if (command_a) { xdir += 0.05f; command_a = false; }
+		if (command_d) { xdir += -0.05f; command_d = false; }
 
+	}
+
+	if (m_vf3Position.y + ydir < -2.0f + m_flength || m_vf3Position.y + ydir > 2.0f - m_flength) {
+		if (command_w) { ydir += -0.05f; command_w = false; }
+		if (command_s) { ydir += 0.05f; command_s = false; }
+	}
 	Translate(xdir, ydir, zdir);
-
 	Object::Update();
 }
 
 void Player::Move_keydown(char direction) {
 	switch (direction) {
 	case 'w':			//╩С
-		xdir = 0.0f;
-		ydir = 0.05f;
-		zdir = 0.0f;
+		if (command_w == false) {
+
+			ydir += 0.05f;
+			command_w = true;
+		}
 		break;
 	case 'a':			//аб
-		xdir = -0.05f;
-		ydir = 0.0f;
-		zdir = 0.0f;
+		if (command_a == false) {
+			xdir += -0.05f;
+			command_a = true;
+		}
 		break;
 	case 's':			//го
-		xdir = 0.0f;
-		ydir = -0.05f;
-		zdir = 0.0f;
+		if (command_s == false) {
+			ydir += -0.05f;
+			command_s = true;
+		}
 		break;
 	case 'd':			//©Л
-		xdir = 0.05f;
-		ydir = 0.0f;
-		zdir = 0.0f;
+		if (command_d == false) {
+			xdir += 0.05f;
+			command_d = true;
+		}
 		break;
 
 	default:
@@ -55,24 +67,33 @@ void Player::Move_keydown(char direction) {
 void Player::Move_keyup(char direction) {
 	switch (direction) {
 	case 'w':
-		xdir = 0.0f;
-		ydir = 0.0f;
-		zdir = 0.0f;
+		if (command_w) {
+			ydir += -0.05f;
+			command_w = false;
+		}
+		break;
 	case 'a':
-		xdir = 0.0f;
-		ydir = 0.0f;
-		zdir = 0.0f;
+		if (command_a) {
+			xdir += 0.05f;
+			command_a = false;
+		}
+		break;
 	case 's':
-		xdir = 0.0f;
-		ydir = 0.0f;
-		zdir = 0.0f;
+		if (command_s) {
+			ydir += 0.05f;
+			command_s = false;
+		}
+		break;
 	case 'd':
-		xdir = 0.0f;
-		ydir = 0.0f;
-		zdir = 0.0f;
+		if (command_d) {
+			xdir += -0.05f;
+			command_d = false;
+		}
 		break;
 
 	default:
 		break;
 	}
+
+
 }
