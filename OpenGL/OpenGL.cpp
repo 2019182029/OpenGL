@@ -34,12 +34,15 @@ std::vector<Object*> walls;
 std::vector<Object*> objects;
 std::vector<Camera*> cameras;
 
-GLfloat weight = 0.1f;
 glm::vec3 lightColor = { 1.0f, 1.0f, 1.0f };
 glm::vec3 lightPosition = { 0.0f, 0.0f, 1.0f };
 
+GLfloat obstacle = 0.1f;
+GLfloat item = 0.1f;
+
 auto beforeTime = std::chrono::high_resolution_clock::now();
 auto currentTime = std::chrono::high_resolution_clock::now();
+auto itemTime = std::chrono::high_resolution_clock::now();
 double elapsedTime = 0.0;
 
 int main(int argc, char** argv) {
@@ -213,7 +216,7 @@ GLvoid draw_scene(GLvoid) {
 
 		glUniform3f(glGetUniformLocation(shaderProgramID, "viewPos"), cam->m_vf3Position.x, cam->m_vf3Position.y, cam->m_vf3Position.z);
 
-		pPlayer->Render(shaderProgramID);
+		if (!pPlayer->m_bTranslucent) { pPlayer->Render(shaderProgramID); }
 
 		for (const auto& wall : walls) {
 			wall->Render(shaderProgramID);
@@ -236,6 +239,8 @@ GLvoid draw_scene(GLvoid) {
 				obj->Render(shaderProgramID);
 			}
 		}
+
+		if (pPlayer->m_bTranslucent) { pPlayer->Render(shaderProgramID); }
 
 		glEnable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
@@ -286,14 +291,30 @@ GLvoid Mouse(int button, int state, int x, int y) {
 
 GLvoid TimerFunction(int value) {
 	// 장애물 생성
-	if (glm::linearRand(0.0f, 10.0f) < weight) {
-		Object* pObject = new Obstacle(0.0f, 0.0f, -30.0f, 0.5f, uid(dre) / 10.0f, uid(dre) / 10.0f, uid(dre) / 10.0f, 0.5f);
+	if (glm::linearRand(0.0f, 10.0f) < obstacle) {
+		Object* pObject;
+
+		if (glm::linearRand(0.0f, 10.0f) < item) { pObject = new Obstacle(0.0f, 0.0f, -30.0f, 0.5f, uid(dre) / 10.0f, uid(dre) / 10.0f, uid(dre) / 10.0f, 0.5f); }  // 아이템
+		else { pObject = new Obstacle(0.0f, 0.0f, -30.0f, 0.5f, uid(dre) / 10.0f, uid(dre) / 10.0f, uid(dre) / 10.0f, 1.0f); }  // 장애물
+		
 		pObject->SetVbo();
 		objects.emplace_back(pObject);
 	}
 
 	// 플레이어 Update
 	pPlayer->Update();
+
+	// 플레이어의 아이템 지속 시간 종료 시
+	if (pPlayer->m_bTranslucent) {
+		if (((std::chrono::duration<double>)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - itemTime)).count() > 2.5f) {  // 2.5초
+			for (auto& vertex : pPlayer->m_pMesh->m_vVertices) {
+				vertex.a = 1.0f;
+			}
+
+			pPlayer->m_bTranslucent = false;
+			pPlayer->SetVbo();
+		}
+	}
 	
 	// 장애물 Update
 	for (const auto& obj : objects) {
@@ -323,7 +344,7 @@ GLvoid TimerFunction(int value) {
 	beforeTime = std::chrono::high_resolution_clock::now();
 
 	if (elapsedTime > 1.0) {
-		weight += 0.01f;
+		obstacle += 0.01f;
 		lightColor = { lightColor.x - 0.01f, lightColor.y - 0.01f, lightColor.z - 0.01f };
 
 		elapsedTime = 0.0;
@@ -335,7 +356,21 @@ GLvoid TimerFunction(int value) {
 
 GLvoid CheckPlayerObjectCollision() {
 	for (auto& obj : objects) {
-		if (glm::distance(pPlayer->m_vf3Position, obj->m_vf3Position) < 0.5f) {  // 플레이어와 장애물 간의 거리가 0.5f 미만이라면
+		if (glm::distance(pPlayer->m_vf3Position, obj->m_vf3Position) > 0.5f) { continue; }  // 플레이어와 장애물 간의 거리가 0.5f 미만이라면
+	
+		if (obj->m_bTranslucent) {  // 장애물이 아이템이라면
+			for (auto& vertex : pPlayer->m_pMesh->m_vVertices) {
+				vertex.a = 0.25f;
+			}
+
+			pPlayer->m_bTranslucent = true;
+			pPlayer->SetVbo();
+
+			itemTime = std::chrono::high_resolution_clock::now();
+		}
+		else {
+			if (pPlayer->m_bTranslucent) { continue; } 
+
 			// 플레이어 사망 처리
 		}
 	}
