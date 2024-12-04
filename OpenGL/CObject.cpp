@@ -218,7 +218,7 @@ void Object::Update() {
 	Rotate(m_vf3RotationSpeed.x, m_vf3RotationSpeed.y, m_vf3RotationSpeed.z);
 	Revolution(m_vf3RevolutionPosition.x, m_vf3RevolutionPosition.y, m_vf3RevolutionPosition.z, m_vf3RevolutionSpeed.x, m_vf3RevolutionSpeed.y, m_vf3RevolutionSpeed.z);
 
-	UpdateBoundingBox();
+	//UpdateBoundingBox();
 }
 
 void Object::UpdateBoundingBox() {
@@ -260,9 +260,6 @@ void Object::UpdateBoundingBox() {
 		}))).z;
 
 	m_AABB[1] = glm::vec3(mf4x4World * glm::vec4(maxX, maxY, maxZ, 1.0f));
-
-	//std::cout << m_AABB[0].x << " " << m_AABB[0].y << " " << m_AABB[0].z << std::endl;
-	//std::cout << m_AABB[1].x << " " << m_AABB[1].y << " " << m_AABB[1].z << std::endl;
 }
 
 void Object::PrepareRender(GLuint iShaderProgramId) {

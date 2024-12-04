@@ -20,6 +20,7 @@ GLvoid KeyboardUp(unsigned char key, int x, int y);
 GLvoid Special(int key, int x, int y);
 GLvoid Mouse(int button, int state, int x, int y);
 GLvoid TimerFunction(int value);
+GLvoid CheckPlayerObjectCollision();
 
 GLint width = 640, height = 640;
 GLint shape = 0;
@@ -299,6 +300,9 @@ GLvoid TimerFunction(int value) {
 		obj->Update();
 	}
 
+	// 플레이어와 장애물 간의 충돌 검사
+	CheckPlayerObjectCollision();
+
 	// 카메라 뒤쪽으로 넘어갔거나 폭발 애니메이션이 끝난 장애물 제거
 	objects.erase(std::remove_if(objects.begin(), objects.end(), [](const auto& obj) {
 		if (((Obstacle*)obj)->m_vf3Position.z > 2.5f || ((Obstacle*)obj)->m_fElapsedTime > 2.5f) {
@@ -327,4 +331,12 @@ GLvoid TimerFunction(int value) {
 
 	glutPostRedisplay();
 	glutTimerFunc(16, TimerFunction, 0);
+}
+
+GLvoid CheckPlayerObjectCollision() {
+	for (auto& obj : objects) {
+		if (glm::distance(pPlayer->m_vf3Position, obj->m_vf3Position) < 0.5f) {  // 플레이어와 장애물 간의 거리가 0.5f 미만이라면
+			// 플레이어 사망 처리
+		}
+	}
 }
