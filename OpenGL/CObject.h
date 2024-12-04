@@ -23,6 +23,7 @@ public:
 	glm::vec3 m_AABB[2];
 
 	bool m_bUseTexture;
+	bool m_bTranslucent;
 
 	std::string m_sType;
 
@@ -52,13 +53,13 @@ public:
 class TriangleObject : public Object {
 public:
 	TriangleObject();
-	TriangleObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	TriangleObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 };
 
 class SquareObject : public Object {
 public:
 	SquareObject();
-	SquareObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	SquareObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,19 +67,19 @@ public:
 class CubeObject : public Object {
 public:
 	CubeObject();
-	CubeObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	CubeObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 };
 
 class SphereObject : public Object {
 public:
 	SphereObject();
-	SphereObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	SphereObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 };
 
 class PyramidObject : public Object {
 public:
 	PyramidObject();
-	PyramidObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	PyramidObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +96,7 @@ public:
 	glm::mat4 m_pmf4x4Transforms[64];
 
 	Obstacle();
-	Obstacle(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	Obstacle(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 
 	virtual void Update();
 	void PrepareExplosion();
@@ -117,7 +118,7 @@ public:
 	Object* m_pSiblingObject;
 
 	HierarchyObject();
-	HierarchyObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	HierarchyObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 
 	void SetFrameName(std::string sFrameName);
 	void SetChildObject(Object* pChildObject);

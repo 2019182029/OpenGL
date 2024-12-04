@@ -11,7 +11,7 @@ void InitBuffer();
 void make_vertexShaders();
 void make_fragmentShaders();
 void make_shaderProgram();
-void add_object(std::string type, GLfloat fx = 0.0f, GLfloat fy = 0.0f, GLfloat fz = 0.0f, GLfloat flength = 0.1f, GLfloat fr = uid(dre) / 10.0f, GLfloat fg = uid(dre) / 10.0f, GLfloat fb = uid(dre) / 10.0f);
+void add_object(std::string type, GLfloat fx = 0.0f, GLfloat fy = 0.0f, GLfloat fz = 0.0f, GLfloat flength = 0.1f, GLfloat fr = uid(dre) / 10.0f, GLfloat fg = uid(dre) / 10.0f, GLfloat fb = uid(dre) / 10.0f, GLfloat fa = 1.0f);
 
 GLvoid draw_scene(GLvoid);
 GLvoid reshape(int w, int h);
@@ -107,27 +107,27 @@ void InitBuffer() {
 	glUseProgram(shaderProgramID);
 
 	// 플레이어
-	pPlayer = new Player(0.0f, -1.0f, 0.0f, 0.5f, 0.0f, 1.0f, 1.0f);
+	pPlayer = new Player(0.0f, -1.0f, 0.0f, 0.5f, 0.0f, 1.0f, 1.0f, 1.0f);
 	pPlayer->SetVbo();
 	pPlayer->Rotate(-90.0f, 0.0f, 0.0f);  // x축으로 -90 회전시켜 반대면
 
 	// 벽
-	Object* pObject = new SquareObject(0.0f, -2.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f);  // 아랫면
+	Object* pObject = new SquareObject(0.0f, -2.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f, 1.0f);  // 아랫면
 	pObject->Rotate(-90.0f, 0.0f, 0.0f);
 	pObject->SetVbo();
 	walls.emplace_back(pObject);
 
-	pObject = new SquareObject(2.0f, 0.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f);  // 오른면
+	pObject = new SquareObject(2.0f, 0.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f, 1.0f);  // 오른면
 	pObject->Rotate(0.0f, -90.0f, 0.0f);
 	pObject->SetVbo();
 	walls.emplace_back(pObject);
 
-	pObject = new SquareObject(0.0f, 2.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f);  // 윗면
+	pObject = new SquareObject(0.0f, 2.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f, 1.0f);  // 윗면
 	pObject->Rotate(90.0f, 0.0f, 0.0f);
 	pObject->SetVbo();
 	walls.emplace_back(pObject);
 
-	pObject = new SquareObject(-2.0f, 0.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f);  // 왼면
+	pObject = new SquareObject(-2.0f, 0.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f, 1.0f);  // 왼면
 	pObject->Rotate(0.0f, 90.0f, 0.0f);
 	pObject->SetVbo();
 	walls.emplace_back(pObject);
@@ -184,15 +184,15 @@ void make_shaderProgram() {
 	glUseProgram(shaderProgramID);
 }
 
-void add_object(std::string stype, GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) {
+void add_object(std::string stype, GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) {
 	Object* pObject;
 
-	if (stype == "Triangle") { pObject = new TriangleObject(fx, fy, fz, flength, fr, fg, fb); }
-	else if (stype == "Square") { pObject = new SquareObject(fx, fy, fz, flength, fr, fg, fb); }
-	else if (stype == "Cube") { pObject = new CubeObject(fx, fy, fz, flength, fr, fg, fb); }
-	else if (stype == "Sphere") { pObject = new SphereObject(fx, fy, fz, flength, fr, fg, fb); }
-	else if (stype == "Pyramid") { pObject = new PyramidObject(fx, fy, fz, flength, fr, fg, fb); }
-	else if (stype == "Hierarchy") { pObject = new HierarchyObject(fx, fy, fz, flength, fr, fg, fb); }
+	if (stype == "Triangle") { pObject = new TriangleObject(fx, fy, fz, flength, fr, fg, fb, fa); }
+	else if (stype == "Square") { pObject = new SquareObject(fx, fy, fz, flength, fr, fg, fb, fa); }
+	else if (stype == "Cube") { pObject = new CubeObject(fx, fy, fz, flength, fr, fg, fb, fa); }
+	else if (stype == "Sphere") { pObject = new SphereObject(fx, fy, fz, flength, fr, fg, fb, fa); }
+	else if (stype == "Pyramid") { pObject = new PyramidObject(fx, fy, fz, flength, fr, fg, fb, fa); }
+	else if (stype == "Hierarchy") { pObject = new HierarchyObject(fx, fy, fz, flength, fr, fg, fb, fa); }
 	else if (stype == "Q") { pObject = new Qobject(fx, fy, fz, flength); }
 	else if (stype == "Axis") { pObject = new Axis(); }
 
@@ -218,9 +218,26 @@ GLvoid draw_scene(GLvoid) {
 			wall->Render(shaderProgramID);
 		}
 
+		// 불투명한 객체 렌더링
 		for (const auto& obj : objects) {
-			obj->Render(shaderProgramID);
+			if (!obj->m_bTranslucent) {
+				obj->Render(shaderProgramID);
+			}
 		}
+
+		// 반투명한 객체 렌더링
+		glDisable(GL_CULL_FACE);
+		glEnable(GL_BLEND);
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		for (const auto& obj : objects) {
+			if (obj->m_bTranslucent) {
+				obj->Render(shaderProgramID);
+			}
+		}
+
+		glEnable(GL_CULL_FACE);
+		glDisable(GL_BLEND);
 	}
 
 	glutSwapBuffers();
@@ -267,14 +284,17 @@ GLvoid Mouse(int button, int state, int x, int y) {
 }
 
 GLvoid TimerFunction(int value) {
+	// 장애물 생성
 	if (glm::linearRand(0.0f, 10.0f) < weight) {
-		Object* pObject = new Obstacle(0.0f, 0.0f, -30.0f, 0.5f, uid(dre) / 10.0f, uid(dre) / 10.0f, uid(dre) / 10.0f);
+		Object* pObject = new Obstacle(0.0f, 0.0f, -30.0f, 0.5f, uid(dre) / 10.0f, uid(dre) / 10.0f, uid(dre) / 10.0f, 0.5f);
 		pObject->SetVbo();
 		objects.emplace_back(pObject);
 	}
 
+	// 플레이어 Update
 	pPlayer->Update();
 	
+	// 장애물 Update
 	for (const auto& obj : objects) {
 		obj->Update();
 	}
@@ -287,6 +307,11 @@ GLvoid TimerFunction(int value) {
 		}
 		return false;
 		}), objects.end());
+
+	// 반투명한 장애물 출력을 위한 Z값 기준 오름차순 정렬
+	std::sort(objects.begin(), objects.end(), [](auto& obj1, auto& obj2) {
+		return (*obj1).m_vf3Position.z < (*obj2).m_vf3Position.z;
+		});
 
 	// 1초마다 난이도 상승
 	currentTime = std::chrono::high_resolution_clock::now();

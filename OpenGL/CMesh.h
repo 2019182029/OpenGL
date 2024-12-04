@@ -14,10 +14,10 @@ public:
 
 class DiffusedVertex : public Vertex {
 public:
-	GLfloat r;  GLfloat g;  GLfloat b;
+	GLfloat r;  GLfloat g;  GLfloat b;  GLfloat a;
 
-	DiffusedVertex() : Vertex() { r = 0.0f; g = 0.0f; b = 0.0f; };
-	DiffusedVertex(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat fr = 0.0f, GLfloat fg = 0.0f, GLfloat fb = 0.0f) : Vertex(fx, fy, fz), r(fr), g(fg), b(fb) {};
+	DiffusedVertex() : Vertex() { r = 0.0f; g = 0.0f; b = 0.0f; a = 1.0f; };
+	DiffusedVertex(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat fr = 0.0f, GLfloat fg = 0.0f, GLfloat fb = 0.0f, GLfloat fa = 1.0f) : Vertex(fx, fy, fz), r(fr), g(fg), b(fb), a(fa) {};
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,13 +38,13 @@ public:
 class TriangleMesh : public Mesh {
 public:
 	TriangleMesh();
-	TriangleMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	TriangleMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 };
 
 class SquareMesh : public Mesh {
 public:
 	SquareMesh();
-	SquareMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	SquareMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -52,19 +52,19 @@ public:
 class CubeMesh : public Mesh {
 public:
 	CubeMesh();
-	CubeMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	CubeMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 };
 
 class SphereMesh : public Mesh {
 public:
 	SphereMesh();
-	SphereMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	SphereMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 };
 
 class PyramidMesh : public Mesh {
 public:
 	PyramidMesh();
-	PyramidMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	PyramidMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ public:
 class AirplaneMesh : public Mesh {
 public:
 	AirplaneMesh();
-	AirplaneMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	AirplaneMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

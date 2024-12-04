@@ -19,6 +19,7 @@ Object::Object() {
 	m_AABB[1] = glm::vec3{ 1.0f };
 
 	m_bUseTexture = false;
+	m_bTranslucent = false;
 
 	m_sType = "";
 }
@@ -44,6 +45,7 @@ Object::Object(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength) {
 	m_AABB[1] = glm::vec3{ 1.0f };
 
 	m_bUseTexture = false;
+	m_bTranslucent = false;
 
 	m_sType = "";
 }
@@ -320,8 +322,9 @@ TriangleObject::TriangleObject() : Object() {
 	m_sType = "Triangle";
 }
 
-TriangleObject::TriangleObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Object(fx, fy, fz, flength) {
-	m_pMesh = new TriangleMesh(flength, fr, fg, fb);
+TriangleObject::TriangleObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Object(fx, fy, fz, flength) {
+	m_pMesh = new TriangleMesh(flength, fr, fg, fb, fa);
+	if (fa != 1.0f) { m_bTranslucent = true; }
 	m_sType = "Triangle";
 }
 
@@ -330,8 +333,9 @@ SquareObject::SquareObject() : Object() {
 	m_sType = "Square";
 }
 
-SquareObject::SquareObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Object(fx, fy, fz, flength) {
-	m_pMesh = new SquareMesh(flength, fr, fg, fb);
+SquareObject::SquareObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Object(fx, fy, fz, flength) {
+	m_pMesh = new SquareMesh(flength, fr, fg, fb, fa);
+	if (fa != 1.0f) { m_bTranslucent = true; }
 	m_sType = "Square";
 }
 
@@ -342,8 +346,9 @@ CubeObject::CubeObject() : Object() {
 	m_sType = "Cube";
 }
 
-CubeObject::CubeObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Object(fx, fy, fz, flength) {
-	m_pMesh = new CubeMesh(flength, fr, fg, fb);
+CubeObject::CubeObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Object(fx, fy, fz, flength) {
+	m_pMesh = new CubeMesh(flength, fr, fg, fb, fa);
+	if (fa != 1.0f) { m_bTranslucent = true; }
 	m_sType = "Cube";
 }
 
@@ -352,8 +357,9 @@ SphereObject::SphereObject() : Object() {
 	m_sType = "Sphere";
 }
 
-SphereObject::SphereObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Object(fx, fy, fz, flength) {
-	m_pMesh = new SphereMesh(flength, fr, fg, fb);
+SphereObject::SphereObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Object(fx, fy, fz, flength) {
+	m_pMesh = new SphereMesh(flength, fr, fg, fb, fa);
+	if (fa != 1.0f) { m_bTranslucent = true; }
 	m_sType = "Sphere";
 }
 
@@ -362,8 +368,9 @@ PyramidObject::PyramidObject() : Object() {
 	m_sType = "Pyramid";
 }
 
-PyramidObject::PyramidObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Object(fx, fy, fz, flength) {
-	m_pMesh = new PyramidMesh(flength, fr, fg, fb);
+PyramidObject::PyramidObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Object(fx, fy, fz, flength) {
+	m_pMesh = new PyramidMesh(flength, fr, fg, fb, fa);
+	if (fa != 1.0f) { m_bTranslucent = true; }
 	m_sType = "Pyramid";
 }
 
@@ -376,26 +383,26 @@ Obstacle::Obstacle() : Object() {
 
 }
 
-Obstacle::Obstacle(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Object(fx, fy, fz, flength) {
+Obstacle::Obstacle(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Object(fx, fy, fz, flength) {
 	SetRotationSpeed(glm::linearRand(-0.5f, 0.5f), glm::linearRand(-0.5f, 0.5f), glm::linearRand(-0.5f, 0.5f));
 
 	switch (uidObstacle(dreObstacle)) {
 	case 0:
-		m_pMesh = new CubeMesh(flength, fr, fg, fb);
+		m_pMesh = new CubeMesh(flength, fr, fg, fb, fa);
 		break;
 
 	case 1:
-		m_pMesh = new SphereMesh(flength, fr, fg, fb);
+		m_pMesh = new SphereMesh(flength, fr, fg, fb, fa);
 		break;
 
 	case 2:
-		m_pMesh = new PyramidMesh(flength, fr, fg, fb);
+		m_pMesh = new PyramidMesh(flength, fr, fg, fb, fa);
 		break;
 
 	default:
 		break;
 	}
-
+	if (fa != 1.0f) { m_bTranslucent = true; }
 	m_sType = "Obstacle";
 
 	xdir = glm::linearRand(-2.0f / 60.0f, 2.0f / 60.0f);
@@ -405,7 +412,7 @@ Obstacle::Obstacle(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat 
 	m_bIsBlowingUp = false;
 	m_fElapsedTime = 0.0f;
 
-	m_pExplosionMesh = new CubeMesh(0.05f, fr, fg, fb);
+	m_pExplosionMesh = new CubeMesh(0.05f, fr, fg, fb, fa);
 	for (int i = 0; i < 64; ++i) {
 		float theta = glm::linearRand(0.0f, glm::two_pi<float>()); 
 		float phi = glm::linearRand(0.0f, glm::pi<float>());       
@@ -464,8 +471,11 @@ void Obstacle::Render(GLuint iShaderProgramId) {
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)(3 * sizeof(float)));
 		glEnableVertexAttribArray(1);
 
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)(2 * 3 * sizeof(float)));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)(6 * sizeof(float)));
 		glEnableVertexAttribArray(2);
+
+		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(DiffusedVertex), (void*)(8 * sizeof(float)));
+		glEnableVertexAttribArray(3);
 
 		for (int i = 0; i < 64; ++i) {
 			unsigned int modelLocation = glGetUniformLocation(iShaderProgramId, "modelTransform");
@@ -503,7 +513,7 @@ HierarchyObject::HierarchyObject() : Object() {
 	m_pSiblingObject = NULL;
 }
 
-HierarchyObject::HierarchyObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Object(fx, fy, fz, flength) {
+HierarchyObject::HierarchyObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Object(fx, fy, fz, flength) {
 	m_pQobj = gluNewQuadric();
 
 	m_vf3RotationOffset = { 0.0f, 0.0f, 0.0f };
@@ -511,7 +521,8 @@ HierarchyObject::HierarchyObject(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat fle
 
 	m_mf4x4Transform = glm::mat4{ 1.0f };
 
-	m_pMesh = new CubeMesh(flength, fr, fg, fb);
+	m_pMesh = new CubeMesh(flength, fr, fg, fb, fa);
+	if (fa != 1.0f) { m_bTranslucent = true; }
 	m_sType = "Hierarchy";
 
 	m_sFrameName = "";

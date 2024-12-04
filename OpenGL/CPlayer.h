@@ -9,7 +9,7 @@ public:
 	float speed = 0.1;
 
 	Player();
-	Player(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb);
+	Player(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 
 	
 	void Move_keydown(char direction);

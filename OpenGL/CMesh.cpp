@@ -14,8 +14,8 @@ TriangleMesh::TriangleMesh() : Mesh() {
 
 }
 
-TriangleMesh::TriangleMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Mesh(flength) {
-	DiffusedVertex vertex = DiffusedVertex(0.0f, 2.0f / 3.0f * flength, 0.0f, fr, fg, fb);  // 0 : 꼭대기
+TriangleMesh::TriangleMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Mesh(flength) {
+	DiffusedVertex vertex = DiffusedVertex(0.0f, 2.0f / 3.0f * flength, 0.0f, fr, fg, fb, fa);  // 0 : 꼭대기
 	vertex.normal = { 0.0f, 0.0f, 1.0f };
 	vertex.s = 0.5f;  vertex.t = 1.0f;
 	m_vVertices.emplace_back(vertex);
@@ -38,8 +38,8 @@ SquareMesh::SquareMesh() : Mesh() {
 
 }
 
-SquareMesh::SquareMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Mesh(flength) {
-	DiffusedVertex vertex = DiffusedVertex(-flength / 2.0f, flength / 2.0f, 0.0f, fr, fg, fb);  // 0 : 정면 왼쪽 위
+SquareMesh::SquareMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Mesh(flength) {
+	DiffusedVertex vertex = DiffusedVertex(-flength / 2.0f, flength / 2.0f, 0.0f, fr, fg, fb, fa);  // 0 : 정면 왼쪽 위
 	vertex.normal = { 0.0f, 0.0f, 1.0f };
 	vertex.s = 0.0f;  vertex.t = 1.0f;
 	m_vVertices.emplace_back(vertex);
@@ -73,8 +73,8 @@ CubeMesh::CubeMesh() : Mesh() {
 
 }
 
-CubeMesh::CubeMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Mesh(flength) {
-	DiffusedVertex vertex = DiffusedVertex(-flength / 2.0f, flength / 2.0f, flength / 2.0f, fr, fg, fb);  // 0 : 정면 왼쪽 위
+CubeMesh::CubeMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Mesh(flength) {
+	DiffusedVertex vertex = DiffusedVertex(-flength / 2.0f, flength / 2.0f, flength / 2.0f, fr, fg, fb, fa);  // 0 : 정면 왼쪽 위
 	vertex.normal = glm::normalize(glm::vec3(vertex.x, vertex.y, vertex.z));
 	m_vVertices.emplace_back(vertex);
 
@@ -165,7 +165,7 @@ SphereMesh::SphereMesh() : Mesh() {
 
 }
 
-SphereMesh::SphereMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) {
+SphereMesh::SphereMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) {
 	int nStacks = 20;
 	int nSlices = 20;
 
@@ -177,7 +177,7 @@ SphereMesh::SphereMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) {
 	int k = 0;
 
 	// 정점
-	DiffusedVertex vertex = DiffusedVertex(0.0f, flength, 0.0f, fr, fg, fb);
+	DiffusedVertex vertex = DiffusedVertex(0.0f, flength, 0.0f, fr, fg, fb, fa);
 	vertex.normal = glm::normalize(glm::vec3(vertex.x, vertex.y, vertex.z));
 	m_vVertices.emplace_back(vertex);
 
@@ -230,8 +230,8 @@ PyramidMesh::PyramidMesh() : Mesh() {
 
 }
 
-PyramidMesh::PyramidMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Mesh(flength) {
-	DiffusedVertex vertex = DiffusedVertex(0.0f, flength * (float)sqrt(3) / 2.0f, 0.0f, fr, fg, fb);  // 0 : 꼭대기
+PyramidMesh::PyramidMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Mesh(flength) {
+	DiffusedVertex vertex = DiffusedVertex(0.0f, flength * (float)sqrt(3) / 2.0f, 0.0f, fr, fg, fb, fa);  // 0 : 꼭대기
 	vertex.normal = glm::normalize(glm::vec3(vertex.x, vertex.y, vertex.z));
 	m_vVertices.emplace_back(vertex);
 
@@ -287,13 +287,13 @@ AirplaneMesh::AirplaneMesh() : Mesh() {
 
 }
 
-AirplaneMesh::AirplaneMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb) : Mesh(flength) {
+AirplaneMesh::AirplaneMesh(GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) : Mesh(flength) {
 	float fx = flength * 0.6f, fy = flength * 0.6f, fz = flength * 0.1f;
 
 	float x1 = fx * 0.2f, y1 = fy * 0.2f, x2 = fx * 0.1f, y3 = fy * 0.3f, y2 = ((y1 - (fy - y3)) / x1) * x2 + (fy - y3);
 
 	auto AddVertex = [&](float x, float y, float z) {
-		DiffusedVertex vertex = DiffusedVertex(x, y, z, fr, fg, fb);
+		DiffusedVertex vertex = DiffusedVertex(x, y, z, fr, fg, fb, fa);
 		vertex.normal = glm::normalize(glm::vec3(vertex.x, vertex.y, vertex.z));
 		m_vVertices.emplace_back(vertex);
 		};
