@@ -17,7 +17,9 @@ void Player::Render(GLuint iShaderProgramId) {
 void Player::Update() {
 	if (m_vf3Position.x + xdir < -2.0f + m_flength || m_vf3Position.x + xdir > 2.0f - m_flength) xdir = 0;
 	if (m_vf3Position.y + ydir < -2.0f + m_flength || m_vf3Position.y + ydir > 2.0f - m_flength) ydir = 0;
+
 	Translate(xdir, ydir, zdir);
+
 	Object::Update();
 }
 
@@ -27,25 +29,21 @@ void Player::Move_keydown(char direction) {
 		xdir = 0.0f;
 		ydir = 0.05f;
 		zdir = 0.0f;
-		printf("w");
 		break;
 	case 'a':			//аб
 		xdir = -0.05f;
 		ydir = 0.0f;
 		zdir = 0.0f;
-		printf("a");
 		break;
 	case 's':			//го
 		xdir = 0.0f;
 		ydir = -0.05f;
 		zdir = 0.0f;
-		printf("s");
 		break;
 	case 'd':			//©Л
 		xdir = 0.05f;
 		ydir = 0.0f;
 		zdir = 0.0f;
-		printf("d\n");
 		break;
 
 	default:
@@ -76,6 +74,4 @@ void Player::Move_keyup(char direction) {
 	default:
 		break;
 	}
-
-
 }

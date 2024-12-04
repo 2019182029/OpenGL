@@ -109,7 +109,7 @@ void InitBuffer() {
 	// 플레이어
 	pPlayer = new Player(0.0f, -1.0f, 0.0f, 0.5f, 0.0f, 1.0f, 1.0f);
 	pPlayer->SetVbo();
-	pPlayer->Rotate(-90.0f, 0.0f, 0.0f);								//x축으로 -90 회전시켜 반대면
+	pPlayer->Rotate(-90.0f, 0.0f, 0.0f);  // x축으로 -90 회전시켜 반대면
 
 	// 벽
 	Object* pObject = new SquareObject(0.0f, -2.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f);  // 아랫면
@@ -273,11 +273,11 @@ GLvoid TimerFunction(int value) {
 		objects.emplace_back(pObject);
 	}
 
+	pPlayer->Update();
+	
 	for (const auto& obj : objects) {
 		obj->Update();
 	}
-
-	pPlayer->Update();
 
 	// 카메라 뒤쪽으로 넘어갔거나 폭발 애니메이션이 끝난 장애물 제거
 	objects.erase(std::remove_if(objects.begin(), objects.end(), [](const auto& obj) {
