@@ -45,6 +45,9 @@ auto currentTime = std::chrono::high_resolution_clock::now();
 auto itemTime = std::chrono::high_resolution_clock::now();
 double elapsedTime = 0.0;
 
+auto startTime = std::chrono::high_resolution_clock::now();
+auto endTime = std::chrono::high_resolution_clock::now();
+
 int main(int argc, char** argv) {
 	// 윈도우 생성
 	glutInit(&argc, argv);
@@ -205,6 +208,43 @@ void add_object(std::string stype, GLfloat fx, GLfloat fy, GLfloat fz, GLfloat f
 	objects.emplace_back(pObject);
 }
 
+void SetOrthoProj() {
+	// 현재 행렬 모드 저장
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	// 현재 뷰포트 가져오기
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+
+	// 투영 모드로 전환
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+	// 직교 투영 행렬 설정
+	gluOrtho2D(0, viewport[2], 0, viewport[3]);
+
+	// 모델뷰 모드로 다시 전환
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void RenderBitmapString(float x, float y, void* font, const char* string) {
+	const char* c;
+	glRasterPos2f(x, y);
+	for (c = string; *c != '\0'; c++) {
+		glutBitmapCharacter(font, *c);
+	}
+}
+
+void SetPerspectiveProj() {
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+}
+
 GLvoid draw_scene(GLvoid) {
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -245,6 +285,35 @@ GLvoid draw_scene(GLvoid) {
 		glEnable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
 	}
+
+	// 텍스트 렌더링
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	int windowWidth = viewport[2];
+	int windowHeight = viewport[3];
+
+	SetOrthoProj();  // 직교 투영 설정
+
+	glUseProgram(0);
+
+	glPushMatrix(); 
+	glLoadIdentity();
+
+	// 텍스트 렌더링
+	if (((Player*)pPlayer)->m_iHP != 0) {
+		RenderBitmapString(10, height - 25, GLUT_BITMAP_HELVETICA_18, ("HP : " + std::to_string(((Player*)pPlayer)->m_iHP)).c_str());  
+		RenderBitmapString(10, height - 50, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
+	}
+	else {
+		RenderBitmapString(10, height - 25, GLUT_BITMAP_HELVETICA_18, (std::string("Game Over!")).c_str());
+		RenderBitmapString(10, height - 50, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
+	}
+
+	glPopMatrix();
+
+	SetPerspectiveProj();  // 원근 투영 설정
+
+	glUseProgram(shaderProgramID);
 
 	glutSwapBuffers();
 }
@@ -356,12 +425,24 @@ GLvoid TimerFunction(int value) {
 		elapsedTime = 0.0;
 	}
 
+	// Score 갱신
+	if (((Player*)pPlayer)->m_iHP != 0) {
+		endTime = std::chrono::high_resolution_clock::now();
+	}
+
+	// 게임 종료 후 5초 경과 시 프로그램 종료
+	if (((std::chrono::duration<double>)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - endTime)).count() > 5.0) {
+		glutLeaveMainLoop();
+	}
+
 	glutPostRedisplay();
 	glutTimerFunc(16, TimerFunction, 0);
 }
 
 GLvoid CheckPlayerObjectCollision() {
 	for (auto& obj : objects) {
+		if (((Obstacle*)obj)->m_bIsBlowingUp) { continue; }  // 장애물이 폭발 중이 아니라면
+
 		if (glm::distance(pPlayer->m_vf3Position, obj->m_vf3Position) > 0.5f) { continue; }  // 플레이어와 장애물 간의 거리가 0.5f 미만이라면
 	
 		if (obj->m_bTranslucent) {  // 장애물이 아이템이라면
@@ -374,11 +455,18 @@ GLvoid CheckPlayerObjectCollision() {
 
 			itemTime = std::chrono::high_resolution_clock::now();
 		}
-		else {
-			if (pPlayer->m_bTranslucent) { continue; } 
+		else {  // 장애물이 아이템이 아니라면
+			if (pPlayer->m_bTranslucent) { continue; }  // 플레이어에게 아이템 효과가 적용되고 있지 않다면
 
-			// 플레이어 사망
-			((Player*)pPlayer)->PrepareExplosion();
+			if (((Player*)pPlayer)->m_iHP > 10) {  
+				((Player*)pPlayer)->m_iHP -= 10;
+			}
+			else {
+				((Player*)pPlayer)->m_iHP = 0;
+				((Player*)pPlayer)->PrepareExplosion();  // 플레이어 사망
+			}
+
+			((Obstacle*)obj)->PrepareExplosion();  // 장애물 폭발
 		}
 	}
 }

@@ -26,6 +26,8 @@ Player::Player(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, 
 
 		m_pvf3Vectors[i] = glm::vec3(x, y, z) * magnitude;  // 방사형 방향 벡터 초기화
 	}
+
+	m_iHP = 100;
 }
 
 void Player::Update() {
