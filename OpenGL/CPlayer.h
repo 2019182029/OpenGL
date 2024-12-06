@@ -10,6 +10,13 @@ public:
 
 	bool command_w = false, command_a = false, command_s = false, command_d = false;
 
+	bool m_bIsBlowingUp;
+	float m_fElapsedTime;
+
+	Mesh* m_pExplosionMesh;
+	glm::vec3 m_pvf3Vectors[64];
+	glm::mat4 m_pmf4x4Transforms[64];
+
 	Player();
 	Player(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 
@@ -18,7 +25,6 @@ public:
 	void Move_keyup(char direction);
 
 	virtual void Update();
+	void PrepareExplosion();
 	virtual void Render(GLuint iShaderProgramId);
-
-	
 };

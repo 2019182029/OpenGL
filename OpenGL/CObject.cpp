@@ -453,6 +453,8 @@ void Obstacle::PrepareExplosion() {
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_pExplosionMesh->m_uiIndicies.size() * sizeof(unsigned int), m_pExplosionMesh->m_uiIndicies.data(), GL_STATIC_DRAW);
+
+	m_bIsBlowingUp = true;
 }
 
 void Obstacle::Render(GLuint iShaderProgramId) {

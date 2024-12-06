@@ -262,6 +262,12 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		static_cast<Player*>(pPlayer)->Move_keydown(key);
 		break;
 
+	case 'q':
+		for (auto& obj : objects) {
+			((Obstacle*)obj)->PrepareExplosion();
+		}
+		break;
+
 	default:
 		break;
 	}
@@ -371,7 +377,8 @@ GLvoid CheckPlayerObjectCollision() {
 		else {
 			if (pPlayer->m_bTranslucent) { continue; } 
 
-			// 플레이어 사망 처리
+			// 플레이어 사망
+			((Player*)pPlayer)->PrepareExplosion();
 		}
 	}
 }
