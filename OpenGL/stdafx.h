@@ -6,6 +6,9 @@
 #include <vector>
 #include <chrono>
 
+#include <windows.h>
+#include <mmsystem.h>
+
 #include <gl/glew.h>
 #include <gl/freeglut.h>
 #include <gl/freeglut_ext.h>

@@ -83,6 +83,8 @@ int main(int argc, char** argv) {
 	glutMouseFunc(Mouse);
 	glutTimerFunc(16, TimerFunction, 0);
 
+	PlaySound(TEXT("bgm.wav"), NULL, SND_ASYNC | SND_LOOP);
+
 	glutMainLoop();
 }
 
