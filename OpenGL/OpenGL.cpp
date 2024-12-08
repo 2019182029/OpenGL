@@ -11,7 +11,7 @@ void InitBuffer();
 void make_vertexShaders();
 void make_fragmentShaders();
 void make_shaderProgram();
-void add_object(std::string type, GLfloat fx = 0.0f, GLfloat fy = 0.0f, GLfloat fz = 0.0f, GLfloat flength = 0.1f, GLfloat fr = uid(dre) / 10.0f, GLfloat fg = uid(dre) / 10.0f, GLfloat fb = uid(dre) / 10.0f, GLfloat fa = 1.0f);
+//void add_object(std::string type, GLfloat fx = 0.0f, GLfloat fy = 0.0f, GLfloat fz = 0.0f, GLfloat flength = 0.1f, GLfloat fr = uid(dre) / 10.0f, GLfloat fg = uid(dre) / 10.0f, GLfloat fb = uid(dre) / 10.0f, GLfloat fa = 1.0f);
 
 GLvoid draw_scene(GLvoid);
 GLvoid reshape(int w, int h);
@@ -33,12 +33,14 @@ GLuint shaderProgramID;
 Object* pPlayer;
 std::vector<Object*> walls;
 std::vector<Object*> objects;
+std::vector<Object*> bullets;
 std::vector<Camera*> cameras;
 
 glm::vec3 lightColor = { 1.0f, 1.0f, 1.0f };
 glm::vec3 lightPosition = { 0.0f, 0.0f, 1.0f };
 
 GLfloat obstacle = 0.1f;
+
 GLfloat item = 0.1f;
 
 auto beforeTime = std::chrono::high_resolution_clock::now();
@@ -194,22 +196,22 @@ void make_shaderProgram() {
 	glUseProgram(shaderProgramID);
 }
 
-void add_object(std::string stype, GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) {
-	Object* pObject;
-
-	if (stype == "Triangle") { pObject = new TriangleObject(fx, fy, fz, flength, fr, fg, fb, fa); }
-	else if (stype == "Square") { pObject = new SquareObject(fx, fy, fz, flength, fr, fg, fb, fa); }
-	else if (stype == "Cube") { pObject = new CubeObject(fx, fy, fz, flength, fr, fg, fb, fa); }
-	else if (stype == "Sphere") { pObject = new SphereObject(fx, fy, fz, flength, fr, fg, fb, fa); }
-	else if (stype == "Pyramid") { pObject = new PyramidObject(fx, fy, fz, flength, fr, fg, fb, fa); }
-	else if (stype == "Hierarchy") { pObject = new HierarchyObject(fx, fy, fz, flength, fr, fg, fb, fa); }
-	else if (stype == "Q") { pObject = new Qobject(fx, fy, fz, flength); }
-	else if (stype == "Axis") { pObject = new Axis(); }
-
-	pObject->SetVbo();
-
-	objects.emplace_back(pObject);
-}
+//void add_object(std::string stype, GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa) {
+//	Object* pObject;
+//
+//	if (stype == "Triangle") { pObject = new TriangleObject(fx, fy, fz, flength, fr, fg, fb, fa); }
+//	else if (stype == "Square") { pObject = new SquareObject(fx, fy, fz, flength, fr, fg, fb, fa); }
+//	else if (stype == "Cube") { pObject = new CubeObject(fx, fy, fz, flength, fr, fg, fb, fa); }
+//	else if (stype == "Sphere") { pObject = new SphereObject(fx, fy, fz, flength, fr, fg, fb, fa); }
+//	else if (stype == "Pyramid") { pObject = new PyramidObject(fx, fy, fz, flength, fr, fg, fb, fa); }
+//	else if (stype == "Hierarchy") { pObject = new HierarchyObject(fx, fy, fz, flength, fr, fg, fb, fa); }
+//	else if (stype == "Q") { pObject = new Qobject(fx, fy, fz, flength); }
+//	else if (stype == "Axis") { pObject = new Axis(); }
+//
+//	pObject->SetVbo();
+//
+//	objects.emplace_back(pObject);
+//}
 
 void SetOrthoProj() {
 	// 현재 행렬 모드 저장
@@ -285,6 +287,12 @@ GLvoid draw_scene(GLvoid) {
 
 		if (pPlayer->m_bTranslucent) { pPlayer->Render(shaderProgramID); }
 
+
+		for (const auto& obj : bullets) {	//총알 그리기
+			if (obj->m_bTranslucent) {obj->Render(shaderProgramID);}
+		}
+
+
 		glEnable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
 	}
@@ -333,6 +341,18 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 	case 'd':
 		static_cast<Player*>(pPlayer)->Move_keydown(key);
 		break;
+
+	case 'e':
+		Object* pbullet;
+		pbullet = new Bullet(pPlayer->m_vf3Position.x, pPlayer->m_vf3Position.y, pPlayer->m_vf3Position.z, 0.25f, 0.8f, 0.7f, 0.5f, 1.0f);   //총알(플레이어의 x,y,z값에 생성)
+		pbullet->m_bTranslucent = true;
+		pbullet->Rotate(-90.0f, 0.0f, 0.0f);  
+
+		pbullet->SetVbo();
+		bullets.emplace_back(pbullet);
+		printf("e");
+		break;
+
 
 	case 'q':
 		for (auto& obj : objects) {
@@ -398,6 +418,12 @@ GLvoid TimerFunction(int value) {
 	
 	// 장애물 Update
 	for (const auto& obj : objects) {
+		obj->Update();
+	}
+	
+
+	// 총알 update
+	for (const auto& obj : bullets) {
 		obj->Update();
 	}
 
