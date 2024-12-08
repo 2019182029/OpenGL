@@ -261,8 +261,15 @@ GLvoid draw_scene(GLvoid) {
 
 		glUniform3f(glGetUniformLocation(shaderProgramID, "viewPos"), cam->m_vf3Position.x, cam->m_vf3Position.y, cam->m_vf3Position.z);
 
+		// 플레이어 렌더링
 		if (!pPlayer->m_bTranslucent) { pPlayer->Render(shaderProgramID); }
 
+		// 총알 렌더링
+		for (const auto& obj : bullets) {  
+			obj->Render(shaderProgramID);
+		}
+
+		// 벽 렌더링
 		for (const auto& wall : walls) {
 			wall->Render(shaderProgramID);
 		}
@@ -286,12 +293,6 @@ GLvoid draw_scene(GLvoid) {
 		}
 
 		if (pPlayer->m_bTranslucent) { pPlayer->Render(shaderProgramID); }
-
-
-		for (const auto& obj : bullets) {	//총알 그리기
-			if (obj->m_bTranslucent) {obj->Render(shaderProgramID);}
-		}
-
 
 		glEnable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
@@ -344,13 +345,12 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 
 	case 'e':
 		Object* pbullet;
-		pbullet = new Bullet(pPlayer->m_vf3Position.x, pPlayer->m_vf3Position.y, pPlayer->m_vf3Position.z, 0.25f, 0.8f, 0.7f, 0.5f, 1.0f);   //총알(플레이어의 x,y,z값에 생성)
+		pbullet = new Bullet(pPlayer->m_vf3Position.x, pPlayer->m_vf3Position.y, pPlayer->m_vf3Position.z, 0.05f, 0.8f, 0.7f, 0.5f, 1.0f);  // 총알(플레이어의 x,y,z값에 생성)
 		pbullet->m_bTranslucent = true;
 		pbullet->Rotate(-90.0f, 0.0f, 0.0f);  
 
 		pbullet->SetVbo();
 		bullets.emplace_back(pbullet);
-		printf("e");
 		break;
 
 
@@ -421,7 +421,6 @@ GLvoid TimerFunction(int value) {
 		obj->Update();
 	}
 	
-
 	// 총알 update
 	for (const auto& obj : bullets) {
 		obj->Update();
@@ -441,9 +440,10 @@ GLvoid TimerFunction(int value) {
 		}
 		return false;
 		}), objects.end());
-
+	
+	// 총알 제거
 	bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const auto& obj) {
-		if (((Bullet*)obj)->m_vf3Position.z < -20.0f || ((Bullet*)obj)->m_fElapsedTime > 2.5f) {
+		if (((Bullet*)obj)->m_vf3Position.z < -30.0f) {
 			delete obj;
 			return true;
 		}
@@ -514,5 +514,14 @@ GLvoid CheckPlayerObjectCollision() {
 }
 
 GLvoid CheckBulletObjectCollision() {
+	for (auto& obj : objects) {
+		if (((Obstacle*)obj)->m_bIsBlowingUp) { continue; }  // 장애물이 폭발 중이 아니라면
 
+		for (auto& bullet : bullets) {
+			if (glm::distance(obj->m_vf3Position, bullet->m_vf3Position) > 0.5f) { continue; }  // 플레이어와 장애물 간의 거리가 0.5f 미만이라면
+
+			((Obstacle*)obj)->PrepareExplosion();  // 장애물 폭발
+			bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet));  // 총알 제거
+		}
+	}
 }
