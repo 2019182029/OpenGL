@@ -466,7 +466,10 @@ GLvoid TimerFunction(int value) {
 
 	if (elapsedTime > 1.0) {
 		obstacle += 0.01f;
-		lightColor = { lightColor.x - 0.01f, lightColor.y - 0.01f, lightColor.z - 0.01f };
+
+		if (lightColor.x > 0.25f) {  // 임계값보다 낮아지지 않도록 설정
+			lightColor = { lightColor.x - 0.01f, lightColor.y - 0.01f, lightColor.z - 0.01f };
+		}
 
 		elapsedTime = 0.0;
 	}
