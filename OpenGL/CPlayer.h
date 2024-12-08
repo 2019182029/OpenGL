@@ -18,6 +18,7 @@ public:
 	glm::mat4 m_pmf4x4Transforms[64];
 
 	int m_iHP;
+	int number_of_bullets;
 
 	int number_of_bullets;
 
