@@ -28,6 +28,8 @@ Player::Player(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, 
 	}
 
 	m_iHP = 100;
+
+	number_of_bullets = 20;
 }
 
 void Player::Update() {
@@ -172,8 +174,6 @@ void Player::Move_keyup(char direction) {
 	default:
 		break;
 	}
-
-
 }
 
 Bullet::Bullet() {

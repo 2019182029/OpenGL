@@ -313,12 +313,14 @@ GLvoid draw_scene(GLvoid) {
 
 	// 텍스트 렌더링
 	if (((Player*)pPlayer)->m_iHP != 0) {
-		RenderBitmapString(10.0f, height - 25.0f, GLUT_BITMAP_HELVETICA_18, ("HP : " + std::to_string(((Player*)pPlayer)->m_iHP)).c_str());  
-		RenderBitmapString(10.0f, height - 50.0f, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
+		RenderBitmapString(10, height - 25, GLUT_BITMAP_HELVETICA_18, ("HP : " + std::to_string(((Player*)pPlayer)->m_iHP)).c_str());
+		RenderBitmapString(10, height - 50, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
+		RenderBitmapString(10, height - 75, GLUT_BITMAP_HELVETICA_18, ("BULLETS : " + std::to_string(((Player*)pPlayer)->number_of_bullets)).c_str());
 	}
 	else {
-		RenderBitmapString(10.0f, height - 25.0f, GLUT_BITMAP_HELVETICA_18, (std::string("Game Over!")).c_str());
-		RenderBitmapString(10.0f, height - 50.0f, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
+		RenderBitmapString(10, height - 25, GLUT_BITMAP_HELVETICA_18, (std::string("Game Over!")).c_str());
+		RenderBitmapString(10, height - 50, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
+		RenderBitmapString(10, height - 75, GLUT_BITMAP_HELVETICA_18, ("BULLETS : " + std::to_string(((Player*)pPlayer)->number_of_bullets)).c_str());
 	}
 
 	glPopMatrix();
@@ -344,15 +346,16 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		break;
 
 	case 'e':
-		Object* pbullet;
-		pbullet = new Bullet(pPlayer->m_vf3Position.x, pPlayer->m_vf3Position.y, pPlayer->m_vf3Position.z, 0.05f, 0.8f, 0.7f, 0.5f, 1.0f);  // 총알(플레이어의 x,y,z값에 생성)
-		pbullet->m_bTranslucent = true;
-		pbullet->Rotate(-90.0f, 0.0f, 0.0f);  
+		if (((Player*)pPlayer)->number_of_bullets > 0) {
+			Object* pbullet;
+			pbullet = new Bullet(pPlayer->m_vf3Position.x, pPlayer->m_vf3Position.y, pPlayer->m_vf3Position.z, 0.05f, 0.8f, 0.7f, 0.5f, 1.0f); 
+			pbullet->m_bTranslucent = true;
+			pbullet->Rotate(-90.0f, 0.0f, 0.0f);
 
-		pbullet->SetVbo();
-		bullets.emplace_back(pbullet);
+			pbullet->SetVbo();
+			bullets.emplace_back(pbullet);
+		}
 		break;
-
 
 	case 'q':
 		for (auto& obj : objects) {
@@ -449,6 +452,7 @@ GLvoid TimerFunction(int value) {
 		}
 		return false;
 		}), bullets.end());
+	((Player*)pPlayer)->number_of_bullets = 20 - bullets.size();
 
 	// 반투명한 장애물 출력을 위한 Z값 기준 오름차순 정렬
 	std::sort(objects.begin(), objects.end(), [](auto& obj1, auto& obj2) {

@@ -19,6 +19,8 @@ public:
 
 	int m_iHP;
 
+	int number_of_bullets;
+
 	Player();
 	Player(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);
 	
