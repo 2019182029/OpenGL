@@ -18,6 +18,7 @@ public:
 	glm::mat4 m_pmf4x4Transforms[64];
 
 	int m_iHP;
+	int number_of_bullets;
 
 	Player();
 	Player(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, GLfloat fg, GLfloat fb, GLfloat fa);

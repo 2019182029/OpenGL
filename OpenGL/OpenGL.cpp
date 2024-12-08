@@ -313,10 +313,12 @@ GLvoid draw_scene(GLvoid) {
 	if (((Player*)pPlayer)->m_iHP != 0) {
 		RenderBitmapString(10, height - 25, GLUT_BITMAP_HELVETICA_18, ("HP : " + std::to_string(((Player*)pPlayer)->m_iHP)).c_str());  
 		RenderBitmapString(10, height - 50, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
+		RenderBitmapString(10, height - 75, GLUT_BITMAP_HELVETICA_18, ("BULLETS : " + std::to_string(((Player*)pPlayer)->number_of_bullets)).c_str());
 	}
 	else {
 		RenderBitmapString(10, height - 25, GLUT_BITMAP_HELVETICA_18, (std::string("Game Over!")).c_str());
 		RenderBitmapString(10, height - 50, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
+		RenderBitmapString(10, height - 75, GLUT_BITMAP_HELVETICA_18, ("BULLETS : " + std::to_string(((Player*)pPlayer)->number_of_bullets)).c_str());
 	}
 
 	glPopMatrix();
@@ -342,14 +344,17 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		break;
 
 	case 'e':
-		Object* pbullet;
-		pbullet = new Bullet(pPlayer->m_vf3Position.x, pPlayer->m_vf3Position.y, pPlayer->m_vf3Position.z, 0.25f, 0.8f, 0.7f, 0.5f, 1.0f);   //총알(플레이어의 x,y,z값에 생성)
-		pbullet->m_bTranslucent = true;
-		pbullet->Rotate(-90.0f, 0.0f, 0.0f);  
+		if (((Player*)pPlayer)->number_of_bullets > 0) {
+			Object* pbullet;
+			pbullet = new Bullet(pPlayer->m_vf3Position.x, pPlayer->m_vf3Position.y, pPlayer->m_vf3Position.z, 0.25f, 0.8f, 0.7f, 0.5f, 1.0f);   //총알(플레이어의 x,y,z값에 생성)
+			pbullet->m_bTranslucent = true;
+			pbullet->Rotate(-90.0f, 0.0f, 0.0f);
 
-		pbullet->SetVbo();
-		bullets.emplace_back(pbullet);
-		printf("e");
+			pbullet->SetVbo();
+			bullets.emplace_back(pbullet);
+			((Player*)pPlayer)->number_of_bullets -= 1;
+		}
+
 		break;
 
 
