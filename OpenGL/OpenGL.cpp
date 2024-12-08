@@ -442,6 +442,14 @@ GLvoid TimerFunction(int value) {
 		return false;
 		}), objects.end());
 
+	bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const auto& obj) {
+		if (((Bullet*)obj)->m_vf3Position.z < -20.0f || ((Bullet*)obj)->m_fElapsedTime > 2.5f) {
+			delete obj;
+			return true;
+		}
+		return false;
+		}), bullets.end());
+
 	// 반투명한 장애물 출력을 위한 Z값 기준 오름차순 정렬
 	std::sort(objects.begin(), objects.end(), [](auto& obj1, auto& obj2) {
 		return (*obj1).m_vf3Position.z < (*obj2).m_vf3Position.z;
