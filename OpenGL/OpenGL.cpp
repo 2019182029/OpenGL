@@ -21,6 +21,7 @@ GLvoid Special(int key, int x, int y);
 GLvoid Mouse(int button, int state, int x, int y);
 GLvoid TimerFunction(int value);
 GLvoid CheckPlayerObjectCollision();
+GLvoid CheckBulletObjectCollision();
 
 GLint width = 640, height = 640;
 GLint shape = 0;
@@ -303,12 +304,12 @@ GLvoid draw_scene(GLvoid) {
 
 	// 텍스트 렌더링
 	if (((Player*)pPlayer)->m_iHP != 0) {
-		RenderBitmapString(10, height - 25, GLUT_BITMAP_HELVETICA_18, ("HP : " + std::to_string(((Player*)pPlayer)->m_iHP)).c_str());  
-		RenderBitmapString(10, height - 50, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
+		RenderBitmapString(10.0f, height - 25.0f, GLUT_BITMAP_HELVETICA_18, ("HP : " + std::to_string(((Player*)pPlayer)->m_iHP)).c_str());  
+		RenderBitmapString(10.0f, height - 50.0f, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
 	}
 	else {
-		RenderBitmapString(10, height - 25, GLUT_BITMAP_HELVETICA_18, (std::string("Game Over!")).c_str());
-		RenderBitmapString(10, height - 50, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
+		RenderBitmapString(10.0f, height - 25.0f, GLUT_BITMAP_HELVETICA_18, (std::string("Game Over!")).c_str());
+		RenderBitmapString(10.0f, height - 50.0f, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
 	}
 
 	glPopMatrix();
@@ -375,6 +376,8 @@ GLvoid TimerFunction(int value) {
 		else { pObject = new Obstacle(0.0f, 0.0f, -30.0f, 0.5f, uid(dre) / 10.0f, uid(dre) / 10.0f, uid(dre) / 10.0f, 1.0f); }  // 장애물
 		
 		pObject->SetVbo();
+		pObject->SetRotationSpeed(glm::linearRand(-5.0f, 5.0f), glm::linearRand(-5.0f, 5.0f), glm::linearRand(-5.0f, 5.0f));
+
 		objects.emplace_back(pObject);
 	}
 
@@ -400,6 +403,9 @@ GLvoid TimerFunction(int value) {
 
 	// 플레이어와 장애물 간의 충돌 검사
 	CheckPlayerObjectCollision();
+
+	// 플레이어의 총알과 장애물 간의 충돌 검사
+	CheckBulletObjectCollision();
 
 	// 카메라 뒤쪽으로 넘어갔거나 폭발 애니메이션이 끝난 장애물 제거
 	objects.erase(std::remove_if(objects.begin(), objects.end(), [](const auto& obj) {
@@ -467,8 +473,12 @@ GLvoid CheckPlayerObjectCollision() {
 				((Player*)pPlayer)->m_iHP = 0;
 				((Player*)pPlayer)->PrepareExplosion();  // 플레이어 사망
 			}
-
-			((Obstacle*)obj)->PrepareExplosion();  // 장애물 폭발
 		}
+
+		((Obstacle*)obj)->PrepareExplosion();  // 장애물 폭발
 	}
+}
+
+GLvoid CheckBulletObjectCollision() {
+
 }
