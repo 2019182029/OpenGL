@@ -130,7 +130,20 @@ void InitBuffer() {
 	pObject->SetTexture("Wall.bmp");
 	walls.emplace_back(pObject);
 
+	pObject = new SquareObject(0.0f, -2.0f, -100.0f, 100.0f, 0.5f, 0.5f, 0.5f, 1.0f);  
+	pObject->Rotate(-90.0f, 0.0f, 0.0f);
+	pObject->SetVbo();
+	pObject->SetTexture("Wall.bmp");
+	walls.emplace_back(pObject);
+
 	pObject = new SquareObject(2.0f, 0.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f, 1.0f);  // 오른면
+	pObject->Rotate(0.0f, -90.0f, 0.0f);
+	pObject->Rotate(-90.0f, 0.0f, 0.0f);
+	pObject->SetVbo();
+	pObject->SetTexture("Wall.bmp");
+	walls.emplace_back(pObject);
+
+	pObject = new SquareObject(2.0f, 0.0f, -100.0f, 100.0f, 0.5f, 0.5f, 0.5f, 1.0f);  
 	pObject->Rotate(0.0f, -90.0f, 0.0f);
 	pObject->Rotate(-90.0f, 0.0f, 0.0f);
 	pObject->SetVbo();
@@ -144,7 +157,21 @@ void InitBuffer() {
 	pObject->SetTexture("Wall.bmp");
 	walls.emplace_back(pObject);
 
+	pObject = new SquareObject(0.0f, 2.0f, -100.0f, 100.0f, 0.5f, 0.5f, 0.5f, 1.0f); 
+	pObject->Rotate(90.0f, 0.0f, 0.0f);
+	pObject->Rotate(0.0f, 180.0f, 0.0f);
+	pObject->SetVbo();
+	pObject->SetTexture("Wall.bmp");
+	walls.emplace_back(pObject);
+
 	pObject = new SquareObject(-2.0f, 0.0f, 0.0f, 100.0f, 0.5f, 0.5f, 0.5f, 1.0f);  // 왼면
+	pObject->Rotate(0.0f, 90.0f, 0.0f);
+	pObject->Rotate(-90.0f, 0.0f, 0.0f);
+	pObject->SetVbo();
+	pObject->SetTexture("Wall.bmp");
+	walls.emplace_back(pObject);
+
+	pObject = new SquareObject(-2.0f, 0.0f, -100.0f, 100.0f, 0.5f, 0.5f, 0.5f, 1.0f); 
 	pObject->Rotate(0.0f, 90.0f, 0.0f);
 	pObject->Rotate(-90.0f, 0.0f, 0.0f);
 	pObject->SetVbo();
@@ -355,7 +382,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 	case 'e':
 		if (((Player*)pPlayer)->number_of_bullets > 0) {
 			Object* pbullet;
-			pbullet = new Bullet(pPlayer->m_vf3Position.x, pPlayer->m_vf3Position.y, pPlayer->m_vf3Position.z, 0.05f, 0.8f, 0.7f, 0.5f, 1.0f); 
+			pbullet = new Bullet(pPlayer->m_vf3Position.x, pPlayer->m_vf3Position.y, pPlayer->m_vf3Position.z, 0.05f, 0.0f, 1.0f, 1.0f, 1.0f); 
 			pbullet->m_bTranslucent = true;
 			pbullet->Rotate(-90.0f, 0.0f, 0.0f);
 
@@ -425,6 +452,16 @@ GLvoid TimerFunction(int value) {
 
 			pPlayer->m_bTranslucent = false;
 			pPlayer->SetVbo();
+		}
+	}
+
+	// 벽 Update
+	for (const auto& wall : walls) {
+		wall->Translate(0.0f, 0.0f, 0.1f);
+
+		// 무한 스크롤링
+		if (wall->m_vf3Position.z > 50.0f) {
+			wall->Translate(0.0f, 0.0f, -200.0f);
 		}
 	}
 	

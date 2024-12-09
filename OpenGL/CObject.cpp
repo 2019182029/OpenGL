@@ -124,7 +124,7 @@ GLubyte* Object::LoadDIBitmap(const char* filename, BITMAPINFO** info) {
 
 	// 비트맵의 크기 설정
 	if ((bitsize = (*info)->bmiHeader.biSizeImage) == 0) {
-		bitsize = ((*info)->bmiHeader.biWidth * (*info)->bmiHeader.biBitCount + 7) / 8.0 * abs((*info)->bmiHeader.biHeight);
+		bitsize = ((*info)->bmiHeader.biWidth * (*info)->bmiHeader.biBitCount + 7) / 8 * abs((*info)->bmiHeader.biHeight);
 	}
 
 	// 비트맵의 크기만큼 메모리를 할당한다.
