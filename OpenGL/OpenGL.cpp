@@ -56,6 +56,9 @@ double reloadTime = 0.0;
 auto startTime = std::chrono::high_resolution_clock::now();
 auto endTime = std::chrono::high_resolution_clock::now();
 
+int bonusScore = 0;
+int totalScore = 0;
+
 int main(int argc, char** argv) {
 	// 윈도우 생성
 	glutInit(&argc, argv);
@@ -361,12 +364,15 @@ GLvoid draw_scene(GLvoid) {
 	if (((Player*)pPlayer)->m_iHP != 0) {
 		RenderBitmapString(10.0f, height - 25.0f, GLUT_BITMAP_HELVETICA_18, ("HP : " + std::to_string(((Player*)pPlayer)->m_iHP)).c_str());
 		RenderBitmapString(10.0f, height - 50.0f, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
-		RenderBitmapString(10.0f, height - 75.0f, GLUT_BITMAP_HELVETICA_18, ("BULLETS : " + std::to_string(((Player*)pPlayer)->number_of_bullets)).c_str());
+		RenderBitmapString(10.0f, height - 75.0f, GLUT_BITMAP_HELVETICA_18, ("BONUS_SCORE : " + std::to_string(bonusScore)).c_str());
+		RenderBitmapString(10.0f, height - 100.0f, GLUT_BITMAP_HELVETICA_18, ("BULLETS : " + std::to_string(((Player*)pPlayer)->number_of_bullets)).c_str());
+
 	}
 	else {
 		RenderBitmapString(10.0f, height - 25.0f, GLUT_BITMAP_HELVETICA_18, (std::string("Game Over!")).c_str());
 		RenderBitmapString(10.0f, height - 50.0f, GLUT_BITMAP_HELVETICA_18, ("SCORE : " + std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000)).c_str());
-		RenderBitmapString(10.0f, height - 75.0f, GLUT_BITMAP_HELVETICA_18, ("BULLETS : " + std::to_string(((Player*)pPlayer)->number_of_bullets)).c_str());
+		RenderBitmapString(10.0f, height - 75.0f, GLUT_BITMAP_HELVETICA_18, ("BONUS_SCORE : " + std::to_string(bonusScore)).c_str());
+		RenderBitmapString(10.0f, height - 100.0f, GLUT_BITMAP_HELVETICA_18, ("TOTAL_SCORE : " + std::to_string(totalScore)).c_str());
 	}
 
 	glPopMatrix();
@@ -553,6 +559,8 @@ GLvoid TimerFunction(int value) {
 		glutLeaveMainLoop();
 	}
 
+	totalScore = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count() / 1000 + bonusScore;
+
 	glutPostRedisplay();
 	glutTimerFunc(16, TimerFunction, 0);
 }
@@ -606,6 +614,7 @@ GLvoid CheckBulletObjectCollision() {
 			SetEvent(hExplosionEvent);
 
 			bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet));  // 총알 제거
+			bonusScore += 1000;
 		}
 	}
 }
