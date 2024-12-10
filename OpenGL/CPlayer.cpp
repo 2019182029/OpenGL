@@ -29,7 +29,7 @@ Player::Player(GLfloat fx, GLfloat fy, GLfloat fz, GLfloat flength, GLfloat fr, 
 
 	m_iHP = 100;
 
-	number_of_bullets = 20;
+	number_of_bullets = 10;
 }
 
 void Player::Update() {
