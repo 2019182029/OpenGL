@@ -51,6 +51,7 @@ auto beforeTime = std::chrono::high_resolution_clock::now();
 auto currentTime = std::chrono::high_resolution_clock::now();
 auto itemTime = std::chrono::high_resolution_clock::now();
 double elapsedTime = 0.0;
+double reloadTime = 0.0;
 
 auto startTime = std::chrono::high_resolution_clock::now();
 auto endTime = std::chrono::high_resolution_clock::now();
@@ -390,7 +391,7 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 		static_cast<Player*>(pPlayer)->Move_keydown(key);
 		break;
 
-	case 'e':
+	case 'l':
 		if (((Player*)pPlayer)->number_of_bullets > 0) {
 			Object* pbullet;
 			pbullet = new Bullet(pPlayer->m_vf3Position.x, pPlayer->m_vf3Position.y, pPlayer->m_vf3Position.z, 0.05f, 0.0f, 1.0f, 1.0f, 1.0f); 
@@ -520,6 +521,7 @@ GLvoid TimerFunction(int value) {
 	// 1초마다 난이도 상승
 	currentTime = std::chrono::high_resolution_clock::now();
 	elapsedTime += ((std::chrono::duration<double>)std::chrono::duration_cast<std::chrono::microseconds>(currentTime - beforeTime)).count();
+	reloadTime += ((std::chrono::duration<double>)std::chrono::duration_cast<std::chrono::microseconds>(currentTime - beforeTime)).count();
 	beforeTime = std::chrono::high_resolution_clock::now();
 
 	if (elapsedTime > 1.0) {
@@ -530,6 +532,15 @@ GLvoid TimerFunction(int value) {
 		}
 
 		elapsedTime = 0.0;
+	}
+
+	// 2초마다 총알 1발 충전
+	if (reloadTime > 2.0) {
+		if (((Player*)pPlayer)->number_of_bullets < 10) {
+			((Player*)pPlayer)->number_of_bullets += 1;
+		}
+
+		reloadTime = 0.0;
 	}
 
 	// Score 갱신
