@@ -23,6 +23,8 @@ GLvoid TimerFunction(int value);
 GLvoid CheckPlayerObjectCollision();
 GLvoid CheckBulletObjectCollision();
 
+DWORD WINAPI PlaySoundEffect(LPVOID arg);
+
 GLint width = 640, height = 640;
 GLint shape = 0;
 
@@ -39,9 +41,11 @@ std::vector<Camera*> cameras;
 glm::vec3 lightColor = { 1.0f, 1.0f, 1.0f };
 glm::vec3 lightPosition = { 0.0f, 0.0f, 1.0f };
 
+GLfloat item = 0.1f;
 GLfloat obstacle = 0.1f;
 
-GLfloat item = 0.1f;
+HANDLE hShootEvent;
+HANDLE hExplosionEvent;
 
 auto beforeTime = std::chrono::high_resolution_clock::now();
 auto currentTime = std::chrono::high_resolution_clock::now();
@@ -86,7 +90,14 @@ int main(int argc, char** argv) {
 	glutMouseFunc(Mouse);
 	glutTimerFunc(16, TimerFunction, 0);
 
-	PlaySound(TEXT("bgm.wav"), NULL, SND_ASYNC | SND_LOOP);
+	// 사운드 이벤트 객체 생성
+	hShootEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	hExplosionEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+	// 사운드 재생 스레드 생성
+	HANDLE hSoundEffectThread;
+	hSoundEffectThread = CreateThread(NULL, 0, PlaySoundEffect, NULL, 0, NULL);
+	if (hSoundEffectThread != NULL) { CloseHandle(hSoundEffectThread); }
 
 	glutMainLoop();
 }
@@ -390,6 +401,8 @@ GLvoid Keyboard(unsigned char key, int x, int y) {
 			bullets.emplace_back(pbullet);
 
 			((Player*)pPlayer)->number_of_bullets -= 1;
+
+			SetEvent(hShootEvent);
 		}
 		break;
 
@@ -535,6 +548,7 @@ GLvoid TimerFunction(int value) {
 
 GLvoid CheckPlayerObjectCollision() {
 	for (auto& obj : objects) {
+		if (((Player*)pPlayer)->m_bIsBlowingUp) { continue; }  // 플레이어가 폭발 중이 아니라면
 		if (((Obstacle*)obj)->m_bIsBlowingUp) { continue; }  // 장애물이 폭발 중이 아니라면
 
 		if (glm::distance(pPlayer->m_vf3Position, obj->m_vf3Position) > 0.5f) { continue; }  // 플레이어와 장애물 간의 거리가 0.5f 미만이라면
@@ -558,10 +572,14 @@ GLvoid CheckPlayerObjectCollision() {
 			else {
 				((Player*)pPlayer)->m_iHP = 0;
 				((Player*)pPlayer)->PrepareExplosion();  // 플레이어 사망
+
+				SetEvent(hExplosionEvent);
 			}
 		}
 
 		((Obstacle*)obj)->PrepareExplosion();  // 장애물 폭발
+
+		SetEvent(hExplosionEvent);
 	}
 }
 
@@ -573,7 +591,37 @@ GLvoid CheckBulletObjectCollision() {
 			if (glm::distance(obj->m_vf3Position, bullet->m_vf3Position) > 0.5f) { continue; }  // 플레이어와 장애물 간의 거리가 0.5f 미만이라면
 
 			((Obstacle*)obj)->PrepareExplosion();  // 장애물 폭발
+
+			SetEvent(hExplosionEvent);
+
 			bullets.erase(std::remove(bullets.begin(), bullets.end(), bullet));  // 총알 제거
 		}
 	}
+}
+
+DWORD __stdcall PlaySoundEffect(LPVOID arg) {
+	// .wav 파일 open
+	mciSendString(TEXT("open \"bgm.wav\" type mpegvideo alias bgm"), NULL, 0, NULL);
+	mciSendString(TEXT("open \"shoot.wav\" type waveaudio alias shoot"), NULL, 0, NULL);
+	mciSendString(TEXT("open \"explosion.wav\" type waveaudio alias explosion"), NULL, 0, NULL);
+
+	// bgm 재생
+	mciSendString(TEXT("play bgm repeat"), NULL, 0, NULL);
+
+	while (1) {
+		// shoot 재생
+		if (WaitForSingleObject(hShootEvent, 0) == WAIT_OBJECT_0) {
+			mciSendString(TEXT("play shoot from 0"), NULL, 0, NULL);
+		}
+
+		// explosion 재생
+		if (WaitForSingleObject(hExplosionEvent, 0) == WAIT_OBJECT_0) {
+			mciSendString(TEXT("play explosion from 0"), NULL, 0, NULL);
+		}
+
+		// 60fps에 맞춰 CPU 사용량 감소
+		Sleep(16);
+	}
+
+	return 0;
 }
